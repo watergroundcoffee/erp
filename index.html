@@ -3759,13 +3759,24 @@ const LOGO_OMI_B64 = "/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAMCAgMCAgMDAwMEAwMEBQgFBQ
           <div style="font-size:12px; color:var(--web-text-dim); margin-bottom:14px;">Klik kartu buat mulai proses otorisasi resmi lewat jendela pop-up - nggak perlu masukin token manual. Pastikan kredensial (Partner ID/App Key) di bawah udah diisi dulu.</div>
           <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
             <div class="mp-connect-card" id="mp-card-shopee">
-              <div class="mp-connect-logo" style="background:linear-gradient(135deg,#ee4d2d,#f95a2c);">🛒</div>
+              <div class="mp-connect-logo" style="background:linear-gradient(135deg,#ee4d2d,#f95a2c);">
+                <svg viewBox="0 0 24 24" width="26" height="26" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M7 8V6.5a5 5 0 0 1 10 0V8" stroke="#fff" stroke-width="1.8" stroke-linecap="round"/>
+                  <path d="M4.5 8h15l-1 12.5a1.5 1.5 0 0 1-1.5 1.5H7a1.5 1.5 0 0 1-1.5-1.5L4.5 8z" fill="#fff"/>
+                  <circle cx="9.5" cy="12" r="1.1" fill="#ee4d2d"/>
+                  <circle cx="14.5" cy="12" r="1.1" fill="#ee4d2d"/>
+                </svg>
+              </div>
               <div class="mp-connect-nama">Shopee</div>
               <div class="mp-connect-badge" id="mp-badge-shopee">Memuat...</div>
               <button class="mp-connect-btn" id="mp-btn-shopee" onclick="mpBukaPopupOtorisasi('shopee')">Hubungkan</button>
             </div>
             <div class="mp-connect-card" id="mp-card-tiktok">
-              <div class="mp-connect-logo" style="background:linear-gradient(135deg,#000000,#25252a);">🎵</div>
+              <div class="mp-connect-logo" style="background:linear-gradient(135deg,#000000,#25252a);">
+                <svg viewBox="0 0 24 24" width="24" height="24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M16.5 3c.3 2.2 1.8 3.7 4 3.9v3c-1.5 0-2.9-.4-4-1.2v6.8a5.5 5.5 0 1 1-5.5-5.5c.3 0 .6 0 .9.06v3.1a2.4 2.4 0 1 0 1.7 2.3V3h2.9z" fill="#fff"/>
+                </svg>
+              </div>
               <div class="mp-connect-nama">TikTok Shop</div>
               <div class="mp-connect-badge" id="mp-badge-tiktok">Memuat...</div>
               <button class="mp-connect-btn" id="mp-btn-tiktok" onclick="mpBukaPopupOtorisasi('tiktok')">Hubungkan</button>
@@ -3812,13 +3823,7 @@ const LOGO_OMI_B64 = "/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAMCAgMCAgMDAwMEAwMEBQgFBQ
           <div class="web-panel-header"><span>🛍️ Shopee Open Platform</span></div>
           <div id="pgt-shopee-status-box" style="display:none; padding:10px 14px; border-radius:8px; margin-bottom:12px; font-size:12.5px;"></div>
           <div style="font-size:12px; color:var(--web-text-dim); line-height:1.6; margin-bottom:14px;">
-            Partner ID & Partner Key diambil dari App List di Shopee Open Platform Console (open.shopee.com).
-          </div>
-
-          <label style="font-size:12px; font-weight:600;">Mode</label>
-          <div class="web-toolbar-row" style="margin:0 0 12px;">
-            <button class="web-chart-toggle-btn" id="pgt-shopee-mode-test" onclick="pgtUbahModeShopee('test')">🧪 Test / Sandbox</button>
-            <button class="web-chart-toggle-btn" id="pgt-shopee-mode-live" onclick="pgtUbahModeShopee('live')">🔴 Live</button>
+            Partner ID & Partner Key diambil dari App List di Shopee Open Platform Console (open.shopee.com). Selalu pakai environment <b>Live</b> (production).
           </div>
 
           <label style="font-size:12px; font-weight:600;">Partner ID <span id="pgt-shopee-partnerid-status" style="font-weight:400; color:var(--web-text-dim);"></span></label>
@@ -4475,7 +4480,7 @@ const LOGO_OMI_B64 = "/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAMCAgMCAgMDAwMEAwMEBQgFBQ
    ISI URL WEB APP APPS SCRIPT KAMU DI SINI
    ====================================================== */
 const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwscY0Z2ECnEAoHTYWa3BchrfGkLSAxa4ZJAexHnLJJWmGtwbM_hUB0e7TvQT5ERa-j/exec";
-const GOOGLE_CLIENT_ID = "https://script.google.com/macros/s/AKfycbwscY0Z2ECnEAoHTYWa3BchrfGkLSAxa4ZJAexHnLJJWmGtwbM_hUB0e7TvQT5ERa-j/exec"; // dari Google Cloud Console, diakhiri .apps.googleusercontent.com
+const GOOGLE_CLIENT_ID = "50839351926-94bjqb78trho7eqetj8igvapqken15qi.apps.googleusercontent.com"; // dari Google Cloud Console, diakhiri .apps.googleusercontent.com
 
 
 // Google Login aktif normal. Set true lagi kalau suatu saat perlu dimatikan sementara
@@ -8221,7 +8226,7 @@ async function pgtSimpanProfil() {
 }
 
 /* ===== Kartu koneksi marketplace (kartu bersih + popup otorisasi, di atas panel kredensial) ===== */
-let mpUrlOtorisasiCache = { shopee: null, tiktok: null };
+let mpKredensialTerisi = { shopee: false, tiktok: false };
 
 async function mpMuatStatusKoneksi() {
   try {
@@ -8238,7 +8243,7 @@ function mpUpdateBadge(platform, data) {
   const badgeEl = el('mp-badge-' + platform);
   const btnEl = el('mp-btn-' + platform);
   if (!data || !data.success) { badgeEl.textContent = 'Gagal cek status'; badgeEl.className = 'mp-connect-badge netral'; return; }
-  mpUrlOtorisasiCache[platform] = data.urlOtorisasi || null;
+  mpKredensialTerisi[platform] = !!data.urlOtorisasi; // kredensial (Partner ID/Key atau App Key/Secret) udah cukup buat bikin link
 
   if (data.terhubung && !data.sudahExpired) {
     badgeEl.textContent = '✓ Terhubung';
@@ -8253,23 +8258,40 @@ function mpUpdateBadge(platform, data) {
     badgeEl.className = 'mp-connect-badge belum';
     btnEl.textContent = 'Hubungkan';
   }
-  btnEl.disabled = !mpUrlOtorisasiCache[platform];
-  btnEl.title = mpUrlOtorisasiCache[platform] ? '' : 'Isi dulu kredensial di bawah sebelum bisa hubungkan';
+  btnEl.disabled = !mpKredensialTerisi[platform];
+  btnEl.title = mpKredensialTerisi[platform] ? '' : 'Isi dulu kredensial di bawah sebelum bisa hubungkan';
 }
 
 let mpPopupWindow = null;
 let mpPopupCheckInterval = null;
 
 function mpBukaPopupOtorisasi(platform) {
-  const url = mpUrlOtorisasiCache[platform];
-  if (!url) {
+  if (!mpKredensialTerisi[platform]) {
     alert('Isi dulu kredensial ' + (platform === 'shopee' ? 'Shopee (Partner ID & Partner Key)' : 'TikTok Shop (App Key & App Secret)') + ' di bawah, baru bisa hubungkan.');
     return;
   }
   const lebar = 500, tinggi = 650;
   const kiri = (window.screen.width - lebar) / 2;
   const atas = (window.screen.height - tinggi) / 2;
-  mpPopupWindow = window.open(url, 'otorisasi_' + platform, `width=${lebar},height=${tinggi},left=${kiri},top=${atas}`);
+  // Buka popup LANGSUNG (synchronous, dalam event klik) biar nggak keblokir popup blocker browser -
+  // isi sementara "menyiapkan...", baru dialihkan begitu link FRESH selesai di-generate. PENTING:
+  // link Shopee cuma valid 5 MENIT sejak dibuat - kalau di-generate dari awal halaman dimuat lalu
+  // di-cache, bisa keburu basi pas diklik. Makanya di-generate baru TIAP KALI diklik, bukan dari cache.
+  const popup = window.open('about:blank', 'otorisasi_' + platform, `width=${lebar},height=${tinggi},left=${kiri},top=${atas}`);
+  if (popup) popup.document.write('<body style="font-family:sans-serif; text-align:center; padding-top:80px; color:#666;">Menyiapkan link otorisasi...</body>');
+  mpPopupWindow = popup;
+
+  const aksi = platform === 'shopee' ? 'minta_link_otorisasi_shopee_fresh' : 'minta_link_otorisasi_tiktok_fresh';
+  postJson({ aksi, email: currentUserEmail() }).then(data => {
+    if (data.success && data.urlOtorisasi && popup && !popup.closed) {
+      popup.location.href = data.urlOtorisasi;
+    } else if (popup && !popup.closed) {
+      popup.document.body.innerHTML = `<div style="color:#b91c1c;">Gagal bikin link otorisasi: ${data.error || 'error tidak diketahui'}</div>`;
+    }
+  }).catch(() => {
+    if (popup && !popup.closed) popup.document.body.innerHTML = '<div style="color:#b91c1c;">Gagal terhubung ke server.</div>';
+  });
+
   if (mpPopupCheckInterval) clearInterval(mpPopupCheckInterval);
   mpPopupCheckInterval = setInterval(() => {
     if (mpPopupWindow && mpPopupWindow.closed) {
@@ -8346,21 +8368,12 @@ async function pgtSyncManualConner() {
   } catch (err) { stopLoadingDots(statusEl); statusEl.textContent = '✗ Gagal terhubung'; statusEl.className = 'status-text err'; }
 }
 
-/* ===== Shopee Open Platform ===== */
-let pgtShopeeModeTerpilih = 'test';
-
-function pgtUbahModeShopee(mode) {
-  pgtShopeeModeTerpilih = mode;
-  el('pgt-shopee-mode-test').classList.toggle('active', mode === 'test');
-  el('pgt-shopee-mode-live').classList.toggle('active', mode === 'live');
-}
-
+/* ===== Shopee Open Platform (permanen Live mode) ===== */
 async function pgtMuatStatusShopee() {
   el('pgt-shopee-partnerid').value = ''; el('pgt-shopee-partnerkey').value = '';
   try {
     const data = await postJson({ aksi: 'lihat_status_kredensial_shopee', email: currentUserEmail() });
     if (!data.success) return;
-    pgtUbahModeShopee(data.mode || 'test');
     el('pgt-shopee-partnerid-status').textContent = data.partnerIdSudahDiisi ? '✓ sudah diisi' : '(belum diisi)';
     el('pgt-shopee-partnerkey-status').textContent = data.partnerKeySudahDiisi ? '✓ sudah diisi' : '(belum diisi)';
     el('pgt-shopee-redirect-uri').value = data.redirectUri || '';
@@ -8394,7 +8407,6 @@ async function pgtSimpanKredensialShopee() {
       aksi: 'simpan_kredensial_shopee',
       partnerId: el('pgt-shopee-partnerid').value.trim(),
       partnerKey: el('pgt-shopee-partnerkey').value.trim(),
-      mode: pgtShopeeModeTerpilih,
       email: currentUserEmail()
     });
     stopLoadingDots(statusEl);
