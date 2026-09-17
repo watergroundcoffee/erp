@@ -1004,6 +1004,26 @@ const LOGO_OMI_B64 = "/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAMCAgMCAgMDAwMEAwMEBQgFBQ
   .login-mobile-header { background:linear-gradient(150deg, #eaf4ff, #dff3ea); padding:26px 20px 20px; text-align:center; }
   .login-mobile-body { padding:24px 22px; }
 
+  /* ===== Kartu koneksi marketplace (Otorisasi via pop-up) ===== */
+  .mp-connect-card {
+    border: 1px solid var(--web-border); border-radius: 14px; padding: 18px 14px; text-align: center;
+    display: flex; flex-direction: column; align-items: center; gap: 8px; background: var(--web-panel);
+    transition: box-shadow 0.15s;
+  }
+  .mp-connect-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.08); }
+  .mp-connect-logo { width: 52px; height: 52px; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 24px; color: #fff; }
+  .mp-connect-nama { font-size: 13.5px; font-weight: 700; }
+  .mp-connect-badge { font-size: 10.5px; font-weight: 700; padding: 3px 10px; border-radius: 999px; }
+  .mp-connect-badge.terhubung { background: rgba(47,158,110,0.12); color: var(--web-accent); }
+  .mp-connect-badge.belum { background: rgba(217,83,79,0.1); color: var(--web-danger); }
+  .mp-connect-badge.netral { background: rgba(150,150,150,0.12); color: var(--web-text-dim); }
+  .mp-connect-btn {
+    width: 100%; margin-top: 4px; padding: 8px 12px; border-radius: 8px; border: 1px solid var(--web-border);
+    background: var(--web-bg); color: var(--web-text); font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.15s;
+  }
+  .mp-connect-btn:hover { border-color: var(--web-info); color: var(--web-info); }
+  .mp-connect-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
   /* ===== Dropdown menu arrow standar (dipakai buat gabung beberapa aksi row jadi 1 tombol) =====
      Pola baku: tombol arrow di ujung kanan row, klik = slide-down + panah jadi ke atas,
      klik lagi/klik luar = slide-up + panah balik ke bawah. */
@@ -1051,7 +1071,8 @@ const LOGO_OMI_B64 = "/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAMCAgMCAgMDAwMEAwMEBQgFBQ
     flex: 1; min-width: 200px; max-width: 320px; padding: 9px 12px; border-radius: 8px;
     border: 1px solid var(--web-border); background: var(--web-panel); color: var(--web-text); font-family: inherit; font-size: 13px;
   }
-  .web-table-wrap { background: var(--web-panel); border: 1px solid var(--web-border); border-radius: 12px; overflow: hidden; }
+  .web-table-wrap { background: var(--web-panel); border: 1px solid var(--web-border); border-radius: 12px; overflow-x: auto; overflow-y: auto; max-height: 62vh; }
+  .web-table-wrap thead th { position: sticky; top: 0; background: var(--web-panel); z-index: 5; }
   .web-table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
   .web-table th { text-align: left; padding: 10px 14px; color: var(--web-text-dim); font-weight: 600; border-bottom: 1px solid var(--web-border); font-size: 11.5px; }
   .web-table td { padding: 10px 14px; border-bottom: 1px solid var(--web-border); }
@@ -2184,13 +2205,13 @@ const LOGO_OMI_B64 = "/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAMCAgMCAgMDAwMEAwMEBQgFBQ
           <!-- ===== SUB-TAB: RETUR ===== -->
           <div id="wp-gabsub-view-retur" style="display:none;">
             <div class="web-toolbar-row" style="margin-bottom:12px;">
-              <input type="text" id="retur-cari" class="web-search-input" placeholder="🔍 Cari No. Resi / Order ID..." oninput="wpRenderRetur()" style="max-width:240px; margin:0;" />
+              <input type="text" id="retur-cari" class="web-search-input" placeholder="🔍 Cari No. Resi / Order ID..." oninput="returPaginasiState.page = 1; wpRenderRetur();" style="max-width:240px; margin:0;" />
               <button class="web-chart-toggle-btn active" id="retur-filter-semua" onclick="returUbahFilter('semua')" style="font-size:11.5px;">Semua</button>
               <button class="web-chart-toggle-btn" id="retur-filter-belum" onclick="returUbahFilter('belum')" style="font-size:11.5px;">Belum Diterima Gudang</button>
-              <select id="retur-filter-status" class="web-form-input" style="margin:0; max-width:190px;" onchange="wpRenderRetur()">
+              <select id="retur-filter-status" class="web-form-input" style="margin:0; max-width:190px;" onchange="returPaginasiState.page = 1; wpRenderRetur();">
                 <option value="">Semua Status</option>
               </select>
-              <select id="retur-sort" class="web-form-input" style="margin:0; max-width:170px;" onchange="wpRenderRetur()">
+              <select id="retur-sort" class="web-form-input" style="margin:0; max-width:170px;" onchange="returPaginasiState.page = 1; wpRenderRetur();">
                 <option value="terbaru">Terbaru</option>
                 <option value="terlama">Terlama</option>
                 <option value="refund_tinggi">Refund Tertinggi</option>
@@ -2709,10 +2730,11 @@ const LOGO_OMI_B64 = "/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAMCAgMCAgMDAwMEAwMEBQgFBQ
         <div id="bel-view-kontak">
           <div class="web-toolbar-row" style="margin-bottom:12px;">
             <button class="web-btn-primary" onclick="belBukaModalSupplier()">+ Tambah Supplier</button>
-            <input type="text" id="bel-kontak-cari" class="web-search-input" placeholder="🔍 Cari nama supplier..." oninput="belRenderKontak()" style="max-width:240px; margin:0;" />
+            <input type="text" id="bel-kontak-cari" class="web-search-input" placeholder="🔍 Cari nama supplier..." oninput="belKontakPaginasiState.page = 1; belRenderKontak();" style="max-width:240px; margin:0;" />
           </div>
-          <div id="bel-kontak-list"></div>
+          <div id="bel-kontak-list" style="max-height:62vh; overflow-y:auto;"></div>
           <div class="web-placeholder" id="bel-kontak-empty" style="display:none;">Belum ada supplier - klik "+ Tambah Supplier" buat mulai.</div>
+          <div id="bel-kontak-paginasi"></div>
         </div>
 
         <!-- ===== Modal Tambah/Edit Supplier ===== -->
@@ -2763,6 +2785,7 @@ const LOGO_OMI_B64 = "/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAMCAgMCAgMDAwMEAwMEBQgFBQ
             </table>
           </div>
           <div class="web-placeholder" id="bel-mintastock-empty" style="display:none;">Belum ada permintaan stock dari gudang.</div>
+          <div id="bel-mintastock-paginasi"></div>
         </div>
 
         <div id="bel-view-transaksi" style="display:none;">
@@ -2780,6 +2803,7 @@ const LOGO_OMI_B64 = "/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAMCAgMCAgMDAwMEAwMEBQgFBQ
               </table>
             </div>
             <div class="web-placeholder" id="bel-manual-empty" style="display:none;">Belum ada pembelian manual - klik "+ Input Pembelian Baru" buat mulai.</div>
+            <div id="bel-manual-paginasi"></div>
           </div>
         </div>
 
@@ -2912,8 +2936,8 @@ const LOGO_OMI_B64 = "/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAMCAgMCAgMDAwMEAwMEBQgFBQ
         <!-- ===== SUB: CLAIM KURANG/RUSAK ===== -->
         <div id="bel-view-claim" style="display:none;">
           <div class="web-toolbar-row" style="margin-bottom:12px;">
-            <input type="text" id="bel-claim-cari" class="web-search-input" placeholder="🔍 Cari No Invoice / No PO / SKU..." oninput="belRenderClaim()" style="max-width:260px; margin:0;" />
-            <select id="bel-claim-filter-status" class="web-form-input" style="margin:0; max-width:160px;" onchange="belRenderClaim()">
+            <input type="text" id="bel-claim-cari" class="web-search-input" placeholder="🔍 Cari No Invoice / No PO / SKU..." oninput="belClaimPaginasiState.page = 1; belRenderClaim();" style="max-width:260px; margin:0;" />
+            <select id="bel-claim-filter-status" class="web-form-input" style="margin:0; max-width:160px;" onchange="belClaimPaginasiState.page = 1; belRenderClaim();">
               <option value="">Semua Status</option>
               <option value="Kurang">Kurang</option>
               <option value="Rusak">Rusak</option>
@@ -2929,6 +2953,7 @@ const LOGO_OMI_B64 = "/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAMCAgMCAgMDAwMEAwMEBQgFBQ
             </table>
           </div>
           <div class="web-placeholder" id="bel-claim-empty" style="display:none;">Belum ada claim kurang/rusak tercatat.</div>
+          <div id="bel-claim-paginasi"></div>
         </div>
 
         <!-- ===== SUB: LAPORAN ===== -->
@@ -3729,6 +3754,25 @@ const LOGO_OMI_B64 = "/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAMCAgMCAgMDAwMEAwMEBQgFBQ
           <div id="pgt-carousel-list" style="display:flex; flex-direction:column; gap:10px;"></div>
         </div>
 
+        <div class="web-panel" data-pgtgroup="marketplace" style="max-width:560px;">
+          <div class="web-panel-header"><span>🔗 Hubungkan Marketplace</span></div>
+          <div style="font-size:12px; color:var(--web-text-dim); margin-bottom:14px;">Klik kartu buat mulai proses otorisasi resmi lewat jendela pop-up - nggak perlu masukin token manual. Pastikan kredensial (Partner ID/App Key) di bawah udah diisi dulu.</div>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+            <div class="mp-connect-card" id="mp-card-shopee">
+              <div class="mp-connect-logo" style="background:linear-gradient(135deg,#ee4d2d,#f95a2c);">🛒</div>
+              <div class="mp-connect-nama">Shopee</div>
+              <div class="mp-connect-badge" id="mp-badge-shopee">Memuat...</div>
+              <button class="mp-connect-btn" id="mp-btn-shopee" onclick="mpBukaPopupOtorisasi('shopee')">Hubungkan</button>
+            </div>
+            <div class="mp-connect-card" id="mp-card-tiktok">
+              <div class="mp-connect-logo" style="background:linear-gradient(135deg,#000000,#25252a);">🎵</div>
+              <div class="mp-connect-nama">TikTok Shop</div>
+              <div class="mp-connect-badge" id="mp-badge-tiktok">Memuat...</div>
+              <button class="mp-connect-btn" id="mp-btn-tiktok" onclick="mpBukaPopupOtorisasi('tiktok')">Hubungkan</button>
+            </div>
+          </div>
+        </div>
+
         <div class="web-panel" data-pgtgroup="marketplace" style="max-width:480px;">
           <div class="web-panel-header"><span>🔧 Conner Hardware (Platform Sales Baru)</span></div>
           <div id="pgt-conner-status-box" style="display:none; padding:10px 14px; border-radius:8px; margin-bottom:12px; font-size:12.5px;"></div>
@@ -3905,6 +3949,8 @@ const LOGO_OMI_B64 = "/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAMCAgMCAgMDAwMEAwMEBQgFBQ
           <div class="web-toolbar-row">
             <button class="web-chart-toggle-btn active" id="katalog-produk-view-table" onclick="katalogProdukGantiTampilan('table')">☰ Table</button>
             <button class="web-chart-toggle-btn" id="katalog-produk-view-card" onclick="katalogProdukGantiTampilan('card')">▦ Card</button>
+            <div style="flex:1;"></div>
+            <button class="web-btn-primary" onclick="katalogBukaModalTambahProduk()" style="font-size:12px;">+ Tambah Produk Baru</button>
           </div>
 
           <!-- TAMPILAN TABLE -->
@@ -4039,6 +4085,31 @@ const LOGO_OMI_B64 = "/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAMCAgMCAgMDAwMEAwMEBQgFBQ
               <div class="status-text" id="katalog-sku-marketplace-status" style="text-align:left; margin-bottom:10px;"></div>
               <div id="katalog-sku-marketplace-list" style="display:flex; flex-direction:column; gap:6px;"></div>
             </div>
+          </div>
+        </div>
+
+        <!-- ===== Modal Tambah Produk Baru ===== -->
+        <div id="katalog-modal-tambah-produk" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.45); z-index:250; align-items:center; justify-content:center; padding:16px;">
+          <div class="web-panel" style="max-width:440px; width:100%; max-height:88vh; overflow-y:auto;">
+            <div class="web-panel-header" style="display:flex; justify-content:space-between; align-items:center;">
+              <span>+ Tambah Produk Baru</span>
+              <button class="web-btn-secondary" style="padding:4px 10px; margin:0;" onclick="katalogTutupModalTambahProduk()">✕</button>
+            </div>
+            <label style="font-size:12px; font-weight:600;">SKU <span style="color:var(--web-danger);">*</span></label>
+            <input id="tp-sku" type="text" class="web-form-input" placeholder="Kode unik, misal SKU12345" />
+            <label style="font-size:12px; font-weight:600;">Nama Produk <span style="color:var(--web-danger);">*</span></label>
+            <input id="tp-nama" type="text" class="web-form-input" placeholder="Nama produk lengkap" />
+            <label style="font-size:12px; font-weight:600;">Merk</label>
+            <input id="tp-merk" type="text" class="web-form-input" placeholder="Opsional" />
+            <label style="font-size:12px; font-weight:600;">Kategori</label>
+            <select id="tp-kategori" class="web-form-input">
+              <option value="">- Pilih Kategori (opsional) -</option>
+            </select>
+            <label style="font-size:12px; font-weight:600;">URL Supplier</label>
+            <input id="tp-url-supplier" type="text" class="web-form-input" placeholder="Opsional, link produk di supplier" />
+            <div style="font-size:11px; color:var(--web-text-dim); margin-bottom:14px;">Harga, HPP, foto, dan detail lain bisa dilengkapi belakangan lewat halaman Detail Produk setelah tersimpan.</div>
+            <button class="web-btn-primary" style="width:100%;" id="tp-btn-simpan" onclick="katalogSimpanProdukBaru()">💾 Simpan</button>
+            <div class="status-text" id="tp-status" style="text-align:left; margin-top:6px;"></div>
           </div>
         </div>
 
@@ -4404,7 +4475,7 @@ const LOGO_OMI_B64 = "/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAMCAgMCAgMDAwMEAwMEBQgFBQ
    ISI URL WEB APP APPS SCRIPT KAMU DI SINI
    ====================================================== */
 const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwscY0Z2ECnEAoHTYWa3BchrfGkLSAxa4ZJAexHnLJJWmGtwbM_hUB0e7TvQT5ERa-j/exec";
-const GOOGLE_CLIENT_ID = "50839351926-94bjqb78trho7eqetj8igvapqken15qi.apps.googleusercontent.com"; // dari Google Cloud Console, diakhiri .apps.googleusercontent.com
+const GOOGLE_CLIENT_ID = "https://script.google.com/macros/s/AKfycbwscY0Z2ECnEAoHTYWa3BchrfGkLSAxa4ZJAexHnLJJWmGtwbM_hUB0e7TvQT5ERa-j/exec"; // dari Google Cloud Console, diakhiri .apps.googleusercontent.com
 
 
 // Google Login aktif normal. Set true lagi kalau suatu saat perlu dimatikan sementara
@@ -5767,6 +5838,35 @@ function ambilCacheLokal(key) {
     if (!raw) return null;
     return JSON.parse(raw).data;
   } catch (e) { return null; }
+}
+
+// ===== Cache TTL - BEDA dari cache instan di atas (yang selalu ke-refresh ulang di belakang
+// layar). Ini beneran SKIP fetch ke server sepenuhnya kalau masih dalam masa berlaku - buat
+// data yang jarang banget berubah (misal daftar Kategori). Dibungkus try-catch penuh biar
+// aman dari localStorage penuh/diblokir/data korup - kalau ada apa-apa, anggap aja cache-nya
+// nggak ada (fallback ke fetch normal), bukan bikin error nge-block halaman.
+function simpanCacheTTL(key, data, ttlMenit) {
+  try {
+    localStorage.setItem('cachettl_' + key, JSON.stringify({ data, kedaluwarsa: Date.now() + ttlMenit * 60000 }));
+  } catch (e) { /* penuh/nggak didukung - nggak fatal, tinggal skip cache-nya */ }
+}
+function ambilCacheTTL(key) {
+  try {
+    const raw = localStorage.getItem('cachettl_' + key);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    if (!parsed || typeof parsed.kedaluwarsa !== 'number' || Date.now() > parsed.kedaluwarsa) {
+      localStorage.removeItem('cachettl_' + key); // kadaluwarsa - bersihin sekalian
+      return null;
+    }
+    return parsed.data;
+  } catch (e) {
+    try { localStorage.removeItem('cachettl_' + key); } catch (e2) {} // data korup, buang aja
+    return null;
+  }
+}
+function hapusCacheTTL(key) {
+  try { localStorage.removeItem('cachettl_' + key); } catch (e) {}
 }
 
 async function wpFetchDashboardPenjualan() {
@@ -8120,6 +8220,67 @@ async function pgtSimpanProfil() {
   } catch (err) { stopLoadingDots(statusEl); statusEl.textContent = '✗ Gagal terhubung: ' + err.message; statusEl.className = 'status-text err'; }
 }
 
+/* ===== Kartu koneksi marketplace (kartu bersih + popup otorisasi, di atas panel kredensial) ===== */
+let mpUrlOtorisasiCache = { shopee: null, tiktok: null };
+
+async function mpMuatStatusKoneksi() {
+  try {
+    const [dataShopee, dataTiktok] = await Promise.all([
+      postJson({ aksi: 'lihat_status_kredensial_shopee', email: currentUserEmail() }),
+      postJson({ aksi: 'lihat_status_token_tiktok', email: currentUserEmail() })
+    ]);
+    mpUpdateBadge('shopee', dataShopee);
+    mpUpdateBadge('tiktok', dataTiktok);
+  } catch (err) {}
+}
+
+function mpUpdateBadge(platform, data) {
+  const badgeEl = el('mp-badge-' + platform);
+  const btnEl = el('mp-btn-' + platform);
+  if (!data || !data.success) { badgeEl.textContent = 'Gagal cek status'; badgeEl.className = 'mp-connect-badge netral'; return; }
+  mpUrlOtorisasiCache[platform] = data.urlOtorisasi || null;
+
+  if (data.terhubung && !data.sudahExpired) {
+    badgeEl.textContent = '✓ Terhubung';
+    badgeEl.className = 'mp-connect-badge terhubung';
+    btnEl.textContent = 'Sambungkan Ulang';
+  } else if (data.terhubung && data.sudahExpired) {
+    badgeEl.textContent = '⚠ Kedaluwarsa';
+    badgeEl.className = 'mp-connect-badge belum';
+    btnEl.textContent = 'Sambungkan Ulang';
+  } else {
+    badgeEl.textContent = 'Belum Terhubung';
+    badgeEl.className = 'mp-connect-badge belum';
+    btnEl.textContent = 'Hubungkan';
+  }
+  btnEl.disabled = !mpUrlOtorisasiCache[platform];
+  btnEl.title = mpUrlOtorisasiCache[platform] ? '' : 'Isi dulu kredensial di bawah sebelum bisa hubungkan';
+}
+
+let mpPopupWindow = null;
+let mpPopupCheckInterval = null;
+
+function mpBukaPopupOtorisasi(platform) {
+  const url = mpUrlOtorisasiCache[platform];
+  if (!url) {
+    alert('Isi dulu kredensial ' + (platform === 'shopee' ? 'Shopee (Partner ID & Partner Key)' : 'TikTok Shop (App Key & App Secret)') + ' di bawah, baru bisa hubungkan.');
+    return;
+  }
+  const lebar = 500, tinggi = 650;
+  const kiri = (window.screen.width - lebar) / 2;
+  const atas = (window.screen.height - tinggi) / 2;
+  mpPopupWindow = window.open(url, 'otorisasi_' + platform, `width=${lebar},height=${tinggi},left=${kiri},top=${atas}`);
+  if (mpPopupCheckInterval) clearInterval(mpPopupCheckInterval);
+  mpPopupCheckInterval = setInterval(() => {
+    if (mpPopupWindow && mpPopupWindow.closed) {
+      clearInterval(mpPopupCheckInterval);
+      mpMuatStatusKoneksi(); // popup ketutup (berhasil ATAU dibatalkan) - cek ulang status terkininya
+      if (platform === 'shopee') pgtMuatStatusShopee(); // sekalian refresh panel detail kredensial di bawahnya
+      else pgtMuatStatusTokenTikTok();
+    }
+  }, 1000);
+}
+
 async function pgtMuatStatusConner() {
   try {
     const data = await postJson({ aksi: 'lihat_status_kredensial_conner', email: currentUserEmail() });
@@ -8354,6 +8515,7 @@ async function pgtMuatStatus() {
   pgtMuatStatusConner();
   pgtMuatStatusShopee();
   pgtMuatSettingMargin();
+  mpMuatStatusKoneksi();
   try {
     const data = await postJson({ aksi: 'lihat_pengaturan_api_key', email: currentUserEmail() });
     if (!data.success) { el('pgt-status').textContent = '✗ ' + (data.error || ''); el('pgt-status').className = 'status-text err'; return; }
@@ -8868,10 +9030,68 @@ async function katalogSimpanEditField(skuLama, field, nilaiBaru) {
 
 let katalogDaftarKategoriCache = [];
 async function katalogMuatDaftarKategori() {
+  const dariCache = ambilCacheTTL('daftar_kategori');
+  if (dariCache) { katalogDaftarKategoriCache = dariCache; return; } // masih valid, skip fetch ke server sepenuhnya
   try {
     const data = await postJson({ aksi: 'lihat_kategori', email: currentUserEmail() });
-    if (data.success) katalogDaftarKategoriCache = (data.kategori || []).map(k => k.nama);
+    if (data.success) {
+      katalogDaftarKategoriCache = (data.kategori || []).map(k => k.nama);
+      simpanCacheTTL('daftar_kategori', katalogDaftarKategoriCache, 60); // kategori jarang berubah, cache 60 menit
+    }
   } catch (err) {}
+}
+
+async function katalogBukaModalTambahProduk() {
+  el('tp-sku').value = '';
+  el('tp-nama').value = '';
+  el('tp-merk').value = '';
+  el('tp-url-supplier').value = '';
+  el('tp-status').textContent = '';
+  el('tp-btn-simpan').disabled = false;
+  if (katalogDaftarKategoriCache.length === 0) await katalogMuatDaftarKategori();
+  el('tp-kategori').innerHTML = '<option value="">- Pilih Kategori (opsional) -</option>' + katalogDaftarKategoriCache.map(k => `<option value="${escapeHtml(k)}">${escapeHtml(k)}</option>`).join('');
+  el('katalog-modal-tambah-produk').style.display = 'flex';
+}
+
+function katalogTutupModalTambahProduk() {
+  el('katalog-modal-tambah-produk').style.display = 'none';
+}
+
+async function katalogSimpanProdukBaru() {
+  const btn = el('tp-btn-simpan');
+  if (btn.disabled) return; // lagi diproses, abaikan klik tambahan
+  const sku = el('tp-sku').value.trim();
+  const namaProduk = el('tp-nama').value.trim();
+  const merk = el('tp-merk').value.trim();
+  const kategori = el('tp-kategori').value;
+  const urlSupplier = el('tp-url-supplier').value.trim();
+  const statusEl = el('tp-status');
+
+  if (!sku) { statusEl.textContent = '✗ SKU wajib diisi.'; statusEl.className = 'status-text err'; return; }
+  if (!namaProduk) { statusEl.textContent = '✗ Nama Produk wajib diisi.'; statusEl.className = 'status-text err'; return; }
+
+  btn.disabled = true;
+  setLoadingDots(statusEl, 'Menyimpan');
+  try {
+    const data = await postJson({ aksi: 'tambah_produk_baru', sku, namaProduk, merk, kategori, urlSupplier, toko: currentToko, email: currentUserEmail() });
+    stopLoadingDots(statusEl);
+    if (data.success) {
+      playBeep();
+      hapusCacheTTL('daftar_kategori'); // jaga-jaga kalau ke depannya alur ini juga bisa bikin kategori baru
+      statusEl.textContent = '✓ Produk tersimpan!';
+      statusEl.className = 'status-text ok';
+      setTimeout(() => { katalogTutupModalTambahProduk(); katalogFetchProduk(); }, 900);
+    } else {
+      statusEl.textContent = '✗ Gagal: ' + (data.error || '');
+      statusEl.className = 'status-text err';
+      btn.disabled = false;
+    }
+  } catch (err) {
+    stopLoadingDots(statusEl);
+    statusEl.textContent = '✗ Gagal terhubung: ' + err.message;
+    statusEl.className = 'status-text err';
+    btn.disabled = false;
+  }
 }
 
 function katalogProdukGantiTampilan(mode) {
@@ -9636,6 +9856,7 @@ async function katalogBuatKategoriMassal() {
       statusEl.className = 'status-text ok';
       katalogRenderInputGridKategori();
       katalogFetchKategori();
+      hapusCacheTTL('daftar_kategori'); // kategori berubah - cache lama udah nggak akurat
     } else { statusEl.textContent = '✗ ' + (data.error || ''); statusEl.className = 'status-text err'; }
   } catch (err) { stopLoadingDots(statusEl); statusEl.textContent = '✗ Gagal terhubung: ' + err.message; statusEl.className = 'status-text err'; }
 }
@@ -9743,13 +9964,14 @@ function belBukaSubMenu(sub) {
   });
   if (sub === 'kontak') belFetchKontak();
   else if (sub === 'mintastock') belFetchMintaStock();
-  else if (sub === 'transaksi') belFetchTransaksi();
+  else if (sub === 'transaksi') belFetchPembelianManual();
   else if (sub === 'claim') belFetchClaim();
   else if (sub === 'laporan') belFetchLaporan();
 }
 
 /* ===== Minta Stock (Gudang) - catatan aja, nggak pengaruh ke sistem ===== */
 let belMintaStockCache = [];
+let belMintaStockPaginasiState = buatStatePaginasi();
 
 async function belFetchMintaStock() {
   if (belMintaStockCache.length === 0) {
@@ -9772,10 +9994,12 @@ function belRenderMintaStock() {
   if (belMintaStockCache.length === 0) {
     el('bel-mintastock-body').innerHTML = '';
     el('bel-mintastock-empty').style.display = 'block';
+    el('bel-mintastock-paginasi').innerHTML = '';
     return;
   }
   el('bel-mintastock-empty').style.display = 'none';
-  el('bel-mintastock-body').innerHTML = belMintaStockCache.map(r => `
+  const halamanIni = halamanDataPaginasi(belMintaStockCache, belMintaStockPaginasiState);
+  el('bel-mintastock-body').innerHTML = halamanIni.map(r => `
     <tr>
       <td>${escapeHtml(r.sku)}</td>
       <td>${escapeHtml(r.nama)}</td>
@@ -9786,6 +10010,7 @@ function belRenderMintaStock() {
       <td><label style="display:flex; align-items:center; gap:6px; cursor:pointer; font-size:12px;"><input type="checkbox" onchange="belToggleMintaStockDipenuhi(${r.row}, this.checked)" /> Sudah Dipenuhi</label></td>
     </tr>
   `).join('');
+  renderPaginasi('bel-mintastock-paginasi', belMintaStockCache.length, belMintaStockPaginasiState, belRenderMintaStock);
 }
 
 async function belToggleMintaStockDipenuhi(row, sudahDipenuhi) {
@@ -9802,6 +10027,7 @@ async function belToggleMintaStockDipenuhi(row, sudahDipenuhi) {
 
 /* ===== Kontak Pemasok ===== */
 let belKontakCache = [];
+let belKontakPaginasiState = buatStatePaginasi();
 
 async function belFetchKontak() {
   if (belKontakCache.length === 0) {
@@ -9827,10 +10053,12 @@ function belRenderKontak() {
   if (daftar.length === 0) {
     el('bel-kontak-list').innerHTML = '';
     el('bel-kontak-empty').style.display = 'block';
+    el('bel-kontak-paginasi').innerHTML = '';
     return;
   }
   el('bel-kontak-empty').style.display = 'none';
-  el('bel-kontak-list').innerHTML = daftar.map(s => `
+  const halamanIni = halamanDataPaginasi(daftar, belKontakPaginasiState);
+  el('bel-kontak-list').innerHTML = halamanIni.map(s => `
     <div class="web-panel" style="margin-bottom:12px;">
       <div style="display:flex; justify-content:space-between; align-items:flex-start;">
         <div>
@@ -9862,6 +10090,7 @@ function belRenderKontak() {
       </div>
     </div>
   `).join('');
+  renderPaginasi('bel-kontak-paginasi', daftar.length, belKontakPaginasiState, belRenderKontak);
 }
 
 let belSupplierRowAktif = null;
@@ -9998,63 +10227,11 @@ async function belHapusCabang(row) {
   } catch (err) { alert('Gagal terhubung: ' + err.message); }
 }
 
-/* ===== Transaksi Pembelian ===== */
-let belTransaksiCache = [];
-
-async function belFetchTransaksi() {
-  belFetchPembelianManual(); // muat sekalian panel pembelian manual di bawahnya
-  if (belTransaksiCache.length === 0) {
-    const dataLokal = ambilCacheLokal('transaksi_pembelian');
-    if (dataLokal) { belTransaksiCache = dataLokal; belRenderTransaksi(); }
-    else el('bel-transaksi-body').innerHTML = '<tr><td colspan="7" style="text-align:center; color:var(--web-text-dim);">Memuat...</td></tr>';
-  }
-  try {
-    const data = await postJson({ aksi: 'lihat_riwayat_minta_stock', email: currentUserEmail() });
-    if (!data.success) { if (belTransaksiCache.length === 0) el('bel-transaksi-body').innerHTML = `<tr><td colspan="7" style="text-align:center; color:var(--web-danger);">Gagal: ${escapeHtml(data.error||'')}</td></tr>`; return; }
-    belTransaksiCache = data.daftar || [];
-
-    const statusSet = [...new Set(belTransaksiCache.map(t => t.status))];
-    const sel = el('bel-transaksi-filter-status');
-    const pilihanSaatIni = sel.value;
-    sel.innerHTML = '<option value="">Semua Status</option>' + statusSet.map(s => `<option value="${escapeHtml(s)}">${escapeHtml(s)}</option>`).join('');
-    sel.value = pilihanSaatIni;
-
-    belRenderTransaksi();
-    simpanCacheLokal('transaksi_pembelian', belTransaksiCache);
-  } catch (err) {
-    if (belTransaksiCache.length === 0) el('bel-transaksi-body').innerHTML = `<tr><td colspan="7" style="text-align:center; color:var(--web-danger);">Gagal terhubung: ${escapeHtml(err.message)}</td></tr>`;
-  }
-}
-
-function belRenderTransaksi() {
-  const cari = (el('bel-transaksi-cari')?.value || '').toLowerCase().trim();
-  const statusPilihan = el('bel-transaksi-filter-status')?.value || '';
-  let daftar = belTransaksiCache;
-  if (statusPilihan) daftar = daftar.filter(t => t.status === statusPilihan);
-  if (cari) daftar = daftar.filter(t => t.sku.toLowerCase().includes(cari) || t.noPO.toLowerCase().includes(cari));
-
-  if (daftar.length === 0) {
-    el('bel-transaksi-body').innerHTML = '';
-    el('bel-transaksi-empty').style.display = 'block';
-    return;
-  }
-  el('bel-transaksi-empty').style.display = 'none';
-  el('bel-transaksi-body').innerHTML = daftar.map(t => `
-    <tr>
-      <td style="font-family:monospace; font-size:11.5px;">${escapeHtml(t.noPO)}</td>
-      <td style="font-size:11px; color:var(--web-text-dim);">${escapeHtml(t.tanggal)}</td>
-      <td>${escapeHtml(t.sku)}</td>
-      <td>${escapeHtml(t.nama)}</td>
-      <td>${t.mintaRestock}</td>
-      <td><span class="web-status-pill dikirim">${escapeHtml(t.status)}</span></td>
-      <td style="font-size:11px; color:var(--web-text-dim);">${escapeHtml(t.noInvoice)}</td>
-    </tr>
-  `).join('');
-}
 
 /* ===== Laporan Pembelian ===== */
 /* ===== Pembelian Manual (formulir) ===== */
 let belPembelianManualCache = [];
+let belPembelianManualPaginasiState = buatStatePaginasi();
 
 // Urai blok teks yang di-copy dari halaman detail pembelian supplier (tabel SKU/Nama/Harga/Qty/Subtotal)
 // jadi array item. Formatnya biasanya per-item 3-4 baris: SKU, Nama Produk, (opsional "Berat: ... | Garansi: ..."),
@@ -10334,10 +10511,14 @@ function belRenderPembelianManual() {
   if (belPembelianManualCache.length === 0) {
     el('bel-manual-body').innerHTML = '';
     el('bel-manual-empty').style.display = 'block';
+    el('bel-manual-paginasi').innerHTML = '';
     return;
   }
   el('bel-manual-empty').style.display = 'none';
-  el('bel-manual-body').innerHTML = belPembelianManualCache.map((p, idx) => {
+  const offset = (belPembelianManualPaginasiState.page - 1) * belPembelianManualPaginasiState.perPage;
+  const halamanIni = halamanDataPaginasi(belPembelianManualCache, belPembelianManualPaginasiState);
+  el('bel-manual-body').innerHTML = halamanIni.map((p, relIdx) => {
+    const idx = offset + relIdx; // index ASLI di array penuh - dipakai row-menu & modal detail biar tetap nunjuk baris yang benar walau lagi di halaman berapapun
     const dibatalkan = p.statusPembelian === 'Dibatalkan';
     return `
     <tr style="${dibatalkan ? 'opacity:0.5;' : ''}">
@@ -10366,6 +10547,7 @@ function belRenderPembelianManual() {
     </tr>
   `;
   }).join('');
+  renderPaginasi('bel-manual-paginasi', belPembelianManualCache.length, belPembelianManualPaginasiState, belRenderPembelianManual);
 }
 
 let pmItemsAktif = [];
@@ -10492,6 +10674,7 @@ async function pmSimpanPembelian() {
 
 /* ===== Claim Kurang/Rusak ===== */
 let belClaimCache = [];
+let belClaimPaginasiState = buatStatePaginasi();
 
 async function belFetchClaim() {
   if (belClaimCache.length === 0) {
@@ -10520,10 +10703,12 @@ function belRenderClaim() {
   if (daftar.length === 0) {
     el('bel-claim-body').innerHTML = '';
     el('bel-claim-empty').style.display = 'block';
+    el('bel-claim-paginasi').innerHTML = '';
     return;
   }
   el('bel-claim-empty').style.display = 'none';
-  el('bel-claim-body').innerHTML = daftar.map(c => `
+  const halamanIni = halamanDataPaginasi(daftar, belClaimPaginasiState);
+  el('bel-claim-body').innerHTML = halamanIni.map(c => `
     <tr>
       <td>${escapeHtml(c.noInvoice || '-')}</td>
       <td style="font-family:monospace; font-size:11.5px;">${escapeHtml(c.noPO)}</td>
@@ -10535,6 +10720,7 @@ function belRenderClaim() {
       <td style="font-size:11px; color:var(--web-text-dim);">${escapeHtml(c.dicatatOleh || '-')}</td>
     </tr>
   `).join('');
+  renderPaginasi('bel-claim-paginasi', daftar.length, belClaimPaginasiState, belRenderClaim);
 }
 
 async function belFetchLaporan() {
