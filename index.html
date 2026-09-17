@@ -1071,7 +1071,7 @@ const LOGO_OMI_B64 = "/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAMCAgMCAgMDAwMEAwMEBQgFBQ
     flex: 1; min-width: 200px; max-width: 320px; padding: 9px 12px; border-radius: 8px;
     border: 1px solid var(--web-border); background: var(--web-panel); color: var(--web-text); font-family: inherit; font-size: 13px;
   }
-  .web-table-wrap { background: var(--web-panel); border: 1px solid var(--web-border); border-radius: 12px; overflow-x: auto; overflow-y: auto; max-height: 62vh; }
+  .web-table-wrap { background: var(--web-panel); border: 1px solid var(--web-border); border-radius: 12px; overflow-x: auto; overflow-y: auto; max-height: 840px; }
   .web-table-wrap thead th { position: sticky; top: 0; background: var(--web-panel); z-index: 5; }
   .web-table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
   .web-table th { text-align: left; padding: 10px 14px; color: var(--web-text-dim); font-weight: 600; border-bottom: 1px solid var(--web-border); font-size: 11.5px; }
@@ -1928,6 +1928,8 @@ const LOGO_OMI_B64 = "/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAMCAgMCAgMDAwMEAwMEBQgFBQ
           <div class="web-submenu-wrap">
             <button class="web-nav-item web-nav-sub" data-wpsub="kontak" onclick="wpBukaSubMenu('kontak')">Kontak Pelanggan</button>
             <button class="web-nav-item web-nav-sub" data-wpsub="semua" onclick="wpBukaSubMenu('semua')">Transaksi Penjualan</button>
+            <button class="web-nav-item web-nav-sub" data-wpsub="tiktok" onclick="wpBukaSubMenu('tiktok')">TikTok Shop</button>
+            <button class="web-nav-item web-nav-sub" data-wpsub="shopee" onclick="wpBukaSubMenu('shopee')">Shopee</button>
             <button class="web-nav-item web-nav-sub" data-wpsub="pengiriman" onclick="wpBukaSubMenu('pengiriman')">Pengiriman</button>
             <button class="web-nav-item web-nav-sub" data-wpsub="dashboard" onclick="wpBukaSubMenu('dashboard')">📊 Laporan</button>
           </div>
@@ -2232,9 +2234,52 @@ const LOGO_OMI_B64 = "/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAMCAgMCAgMDAwMEAwMEBQgFBQ
           </div>
         </div>
 
-        <!-- SUB-MENU TOP-LEVEL: SHOPEE (placeholder) -->
+        <!-- SUB-MENU TOP-LEVEL: SHOPEE -->
         <div id="wp-view-shopee" style="display:none;">
-          <div class="web-placeholder">🚧 Shopee belum terhubung - fitur ini aktif setelah API Shopee tersambung.</div>
+          <div class="web-toolbar-row">
+            <span style="font-size:13px; font-weight:600;">🛒 Pesanan Shopee</span>
+            <div style="flex:1;"></div>
+            <span id="wp-shopee-sync-status" style="font-size:11px; color:var(--web-text-dim); align-self:center;"></span>
+            <button class="web-btn-primary" id="wp-shopee-sync-btn" onclick="wpSyncPesananShopee()" style="font-size:12px;">🔄 Sync Pesanan Terbaru</button>
+          </div>
+
+          <div class="web-toolbar-row">
+            <input type="text" id="wp-shopee-cari" class="web-search-input" placeholder="🔍 Cari No Pesanan / Pembeli..." oninput="wpShopeePaginasiState.page = 1; wpRenderPesananShopee();" style="max-width:240px; margin:0;" />
+            <select id="wp-shopee-filter-status" class="web-form-input" style="max-width:190px; margin-bottom:0;" onchange="wpShopeePaginasiState.page = 1; wpRenderPesananShopee();">
+              <option value="">Semua Status</option>
+              <option value="UNPAID">Menunggu pembayaran</option>
+              <option value="READY_TO_SHIP">Perlu dikirim</option>
+              <option value="PROCESSED">Diproses</option>
+              <option value="SHIPPED">Dikirim</option>
+              <option value="COMPLETED">Selesai</option>
+              <option value="CANCELLED">Dibatalkan</option>
+            </select>
+          </div>
+
+          <div class="web-table-wrap">
+            <table class="web-table">
+              <thead><tr><th>Tanggal</th><th>Produk</th><th>Total</th><th>Status</th><th>Kurir</th><th>No Resi</th><th>Pembeli</th><th></th></tr></thead>
+              <tbody id="wp-shopee-body"></tbody>
+            </table>
+          </div>
+          <div class="web-placeholder" id="wp-shopee-empty" style="display:none;">Belum ada pesanan Shopee yang disinkronkan. Klik "Sync Pesanan Terbaru".</div>
+          <div id="wp-shopee-paginasi"></div>
+        </div>
+
+        <!-- Modal Input Data Pembeli Shopee - sama persis pola TikTok Shop -->
+        <div id="wp-shopee-modal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.4); z-index:200; align-items:center; justify-content:center;">
+          <div class="web-panel" style="max-width:420px; width:90%;">
+            <div class="web-panel-header"><span>Input Data Pembeli</span></div>
+            <div style="font-size:11.5px; color:var(--web-text-dim); margin-bottom:10px;">No Pesanan: <span id="wp-shopee-modal-nopesanan"></span></div>
+            <input id="wp-shopee-modal-username" class="web-form-input" placeholder="Username Shopee pembeli" />
+            <input id="wp-shopee-modal-nama" class="web-form-input" placeholder="Nama lengkap pembeli" />
+            <input id="wp-shopee-modal-hp" class="web-form-input" placeholder="No HP/WA" data-format="nohp" />
+            <input id="wp-shopee-modal-alamat" class="web-form-input" placeholder="Alamat lengkap" />
+            <input id="wp-shopee-modal-catatan" class="web-form-input" placeholder="Catatan (opsional)" />
+            <button class="web-btn-primary" style="width:100%;" onclick="wpSimpanDataPembeliShopee()">💾 Simpan</button>
+            <button class="web-btn-secondary" style="width:100%; margin-top:6px;" onclick="wpTutupModalShopee()">Batal</button>
+            <div class="status-text" id="wp-shopee-modal-status" style="text-align:left; margin-top:6px;"></div>
+          </div>
         </div>
 
         <!-- SUB-MENU TOP-LEVEL: WEBSITE TOKO (placeholder) -->
@@ -2328,18 +2373,16 @@ const LOGO_OMI_B64 = "/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAMCAgMCAgMDAwMEAwMEBQgFBQ
         <div id="wp-view-pengiriman" style="display:none;">
           <div class="web-panel-header" style="margin-bottom:6px;"><span>Pengiriman</span></div>
           <div class="web-toolbar-row">
-            <button class="web-chart-toggle-btn active" id="wp-pgr-tab-keluar" onclick="wpPengirimanGantiTab('keluar')">Log Resi Keluar</button>
-            <button class="web-chart-toggle-btn" id="wp-pgr-tab-masuk" onclick="wpPengirimanGantiTab('masuk')">Log Resi Masuk</button>
-            <button class="web-chart-toggle-btn" id="wp-pgr-tab-pending" onclick="wpPengirimanGantiTab('pending')">Pesanan Pending</button>
-            <button class="web-chart-toggle-btn" id="wp-pgr-tab-finalisasi" onclick="wpPengirimanGantiTab('finalisasi')">Finalisasi (Selesai/Retur)</button>
+            <button class="web-chart-toggle-btn active" id="wp-pgr-tab-keluar" onclick="wpPengirimanGantiTab('keluar')">Resi Keluar</button>
+            <button class="web-chart-toggle-btn" id="wp-pgr-tab-masuk" onclick="wpPengirimanGantiTab('masuk')">Resi Masuk</button>
           </div>
 
-          <!-- TAB: LOG RESI KELUAR -->
+          <!-- TAB: RESI KELUAR -->
           <div id="wp-pgr-view-keluar" style="margin-top:12px;">
-            <div style="font-size:11.5px; color:var(--web-text-dim); margin-bottom:10px;">Semua resi yang discan admin gudang buat pengiriman keluar, otomatis dicocokkan ke No Invoice pesanan (baik yang discan itu No Resi ATAU No Invoice-nya langsung).</div>
+            <div style="font-size:11.5px; color:var(--web-text-dim); margin-bottom:10px;">Semua resi yang discan admin gudang buat pengiriman keluar, otomatis dicocokkan ke No Invoice pesanan.</div>
             <div class="web-table-wrap">
               <table class="web-table">
-                <thead><tr><th>Yang Discan</th><th>Waktu Scan</th><th>Kurir</th><th>No Invoice (Cocok)</th><th>Pembeli</th><th>Status Pesanan</th><th>Dicatat Oleh</th></tr></thead>
+                <thead><tr><th>No Resi</th><th>Waktu Scan</th><th>Kurir</th><th>No Invoice</th><th>Status Pesanan</th><th>Resi Retur</th></tr></thead>
                 <tbody id="wp-logkeluar-body"></tbody>
               </table>
             </div>
@@ -2347,47 +2390,17 @@ const LOGO_OMI_B64 = "/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAMCAgMCAgMDAwMEAwMEBQgFBQ
             <div id="wp-logkeluar-paginasi"></div>
           </div>
 
-          <!-- TAB: LOG RESI MASUK -->
+          <!-- TAB: RESI MASUK -->
           <div id="wp-pgr-view-masuk" style="display:none; margin-top:12px;">
-            <div style="font-size:11.5px; color:var(--web-text-dim); margin-bottom:10px;">Resi yang discan masuk (retur/komplain), otomatis dicocokkan ke pesanan yang statusnya Retur.</div>
+            <div style="font-size:11.5px; color:var(--web-text-dim); margin-bottom:10px;">Resi yang discan masuk (retur/komplain), otomatis dicocokkan ke pesanan asalnya.</div>
             <div class="web-table-wrap">
               <table class="web-table">
-                <thead><tr><th>Yang Discan</th><th>Waktu Scan</th><th>Kurir</th><th>No Invoice (Cocok)</th><th>Pembeli</th><th>Cocok Retur?</th><th>Dicatat Oleh</th></tr></thead>
+                <thead><tr><th>No Resi</th><th>Waktu Scan</th><th>Kurir</th><th>No Invoice</th><th>Status Pesanan</th><th>Resi Retur</th></tr></thead>
                 <tbody id="wp-logmasuk-body"></tbody>
               </table>
             </div>
             <div class="web-placeholder" id="wp-logmasuk-empty" style="display:none;">Belum ada resi masuk yang discan.</div>
             <div id="wp-logmasuk-paginasi"></div>
-          </div>
-
-          <!-- TAB: PESANAN PENDING -->
-          <div id="wp-pgr-view-pending" style="display:none; margin-top:12px;">
-            <div style="font-size:11.5px; color:var(--web-text-dim); margin-bottom:10px;">Pesanan yang udah "siap dikirim" (ada No Resi dari marketplace/kurir) tapi BELUM discan hari ini/kapanpun. Ini yang harus dikejar discan.</div>
-            <div class="web-toolbar-row">
-              <button class="web-chart-toggle-btn active" id="wp-pending-segmen-semua" onclick="wpPendingGantiSegmen('Semua')" style="font-size:11.5px; padding:5px 10px;">Semua</button>
-              <button class="web-chart-toggle-btn" id="wp-pending-segmen-offline" onclick="wpPendingGantiSegmen('Offline (PO Sales)')" style="font-size:11.5px; padding:5px 10px;">Offline (PO Sales)</button>
-              <button class="web-chart-toggle-btn" id="wp-pending-segmen-marketplace" onclick="wpPendingGantiSegmen('Marketplace (TikTok Shop)')" style="font-size:11.5px; padding:5px 10px;">Marketplace</button>
-            </div>
-            <div class="web-table-wrap">
-              <table class="web-table">
-                <thead><tr><th>Segmen</th><th>No Invoice</th><th>No Resi</th><th>Pembeli</th><th>Tanggal</th></tr></thead>
-                <tbody id="wp-pending-body"></tbody>
-              </table>
-            </div>
-            <div class="web-placeholder" id="wp-pending-empty" style="display:none;">Nggak ada pesanan pending - semua udah discan!</div>
-          </div>
-
-          <!-- TAB: FINALISASI (Selesai/Retur) - fitur lama, dipertahankan -->
-          <div id="wp-pgr-view-finalisasi" style="display:none; margin-top:12px;">
-            <div style="font-size:11.5px; color:var(--web-text-dim); margin-bottom:10px;">Tiap resi keluar harus difinalisasi jadi <b>Selesai</b> (dana masuk/penghasilan) atau <b>Retur</b> (barang balik, stock otomatis dikembalikan). Kalau status masih "Dikirim" lebih dari 7 hari, ditandai perlu ditindaklanjuti.</div>
-            <div id="wp-pengiriman-notif" style="display:none; background:rgba(217,83,79,0.1); border:1px solid var(--web-danger); border-radius:8px; padding:10px 14px; margin-bottom:12px; font-size:13px; color:var(--web-danger); font-weight:600;"></div>
-            <div class="web-table-wrap">
-              <table class="web-table">
-                <thead><tr><th>No Invoice</th><th>Tanggal</th><th>Pembeli</th><th>No Resi</th><th>Total</th><th>Status</th><th>Aksi</th></tr></thead>
-                <tbody id="wp-pengiriman-body"></tbody>
-              </table>
-            </div>
-            <div class="web-placeholder" id="wp-pengiriman-empty" style="display:none;">Belum ada pesanan yang sudah dikirim (ada No Resi).</div>
           </div>
         </div>
 
@@ -5344,9 +5357,135 @@ function wpBukaSubMenu(sub) {
   else if (sub === 'pengiriman') { wpHentikanAutoRefreshTikTok(); wpHentikanAutoRefreshGabungan(); wpPengirimanGantiTab('keluar'); }
   else if (sub === 'laporanjual') { wpHentikanAutoRefreshTikTok(); wpHentikanAutoRefreshGabungan(); wpFetchLaporanPenjualan(); }
   else if (sub === 'tiktok') { wpHentikanAutoRefreshGabungan(); wpTiktokGantiTab('semua'); wpMulaiAutoRefreshTikTok(); }
+  else if (sub === 'shopee') { wpHentikanAutoRefreshTikTok(); wpHentikanAutoRefreshGabungan(); wpFetchPesananShopee(); }
   else if (sub === 'posales') { wpHentikanAutoRefreshTikTok(); wpHentikanAutoRefreshGabungan(); wpPosalesGantiTab('semua'); }
   else { wpHentikanAutoRefreshTikTok(); wpHentikanAutoRefreshGabungan(); }
-  // shopee & website: placeholder, nggak perlu fetch apapun
+  // website: placeholder, nggak perlu fetch apapun
+}
+
+/* ===== Pesanan Shopee ===== */
+let wpShopeeCache = [];
+let wpShopeePaginasiState = buatStatePaginasi();
+let wpShopeeRowAktif = null;
+
+async function wpFetchPesananShopee() {
+  if (wpShopeeCache.length === 0) {
+    const dataLokal = ambilCacheLokal('pesanan_shopee');
+    if (dataLokal) { wpShopeeCache = dataLokal; wpRenderPesananShopee(); }
+    else el('wp-shopee-body').innerHTML = '<tr><td colspan="8" style="text-align:center; color:var(--web-text-dim);">Memuat...</td></tr>';
+  }
+  try {
+    const data = await postJson({ aksi: 'lihat_pesanan_shopee', email: currentUserEmail() });
+    if (!data.success) { if (wpShopeeCache.length === 0) el('wp-shopee-body').innerHTML = `<tr><td colspan="8" style="text-align:center; color:var(--web-danger);">Gagal: ${escapeHtml(data.error||'')}</td></tr>`; return; }
+    wpShopeeCache = data.daftar || [];
+    wpRenderPesananShopee();
+    simpanCacheLokal('pesanan_shopee', wpShopeeCache);
+  } catch (err) {
+    if (wpShopeeCache.length === 0) el('wp-shopee-body').innerHTML = `<tr><td colspan="8" style="text-align:center; color:var(--web-danger);">Gagal terhubung: ${escapeHtml(err.message)}</td></tr>`;
+  }
+}
+
+function wpRenderPesananShopee() {
+  const cari = (el('wp-shopee-cari')?.value || '').toLowerCase().trim();
+  const filterStatus = el('wp-shopee-filter-status')?.value || '';
+  let daftar = wpShopeeCache;
+  if (filterStatus) daftar = daftar.filter(o => o.status === filterStatus);
+  if (cari) daftar = daftar.filter(o => (o.noPesanan||'').toLowerCase().includes(cari) || (o.namaManual||'').toLowerCase().includes(cari) || (o.usernameManual||'').toLowerCase().includes(cari));
+
+  if (daftar.length === 0) {
+    el('wp-shopee-body').innerHTML = '';
+    el('wp-shopee-empty').style.display = 'block';
+    el('wp-shopee-paginasi').innerHTML = '';
+    return;
+  }
+  el('wp-shopee-empty').style.display = 'none';
+  const halamanIni = halamanDataPaginasi(daftar, wpShopeePaginasiState);
+  el('wp-shopee-body').innerHTML = halamanIni.map((o, idx) => {
+    const punyaDataManual = o.namaManual && o.namaManual.trim();
+    const namaTampil = punyaDataManual ? o.namaManual : ((o.namaTersamar || o.usernameManual || '-') + (o.namaTersamar ? ' (tersamar)' : ''));
+    return `
+      <tr>
+        <td style="font-size:11.5px; color:var(--web-text-dim);">${escapeHtml(o.tanggal)}</td>
+        <td style="font-size:11.5px; max-width:220px;">${escapeHtml(o.produk || '-')}</td>
+        <td style="font-weight:600;">Rp ${Number(o.total).toLocaleString('id-ID')}</td>
+        <td><span class="web-status-pill dikirim">${escapeHtml(o.status)}</span></td>
+        <td style="font-size:11.5px;">${escapeHtml(o.kurir || '-')}</td>
+        <td style="font-size:11.5px; font-family:monospace;">${escapeHtml(o.noResi || '-')}</td>
+        <td style="font-size:11.5px; ${punyaDataManual ? 'color:var(--web-accent); font-weight:600;' : 'color:var(--web-text-dim);'}">${escapeHtml(namaTampil)}</td>
+        <td><button class="web-chart-toggle-btn" data-idx="${idx}">${punyaDataManual ? 'Edit' : '+ Input'} Data</button></td>
+      </tr>
+    `;
+  }).join('');
+  el('wp-shopee-body').querySelectorAll('button[data-idx]').forEach(btn => {
+    btn.addEventListener('click', () => wpBukaModalShopee(halamanIni[parseInt(btn.dataset.idx, 10)]));
+  });
+  renderPaginasi('wp-shopee-paginasi', daftar.length, wpShopeePaginasiState, wpRenderPesananShopee);
+}
+
+function wpBukaModalShopee(order) {
+  wpShopeeRowAktif = order.row;
+  el('wp-shopee-modal-nopesanan').textContent = order.noPesanan;
+  el('wp-shopee-modal-username').value = order.usernameManual || '';
+  el('wp-shopee-modal-nama').value = order.namaManual || '';
+  el('wp-shopee-modal-hp').value = order.hpManual || '';
+  el('wp-shopee-modal-alamat').value = order.alamatManual || '';
+  el('wp-shopee-modal-catatan').value = order.catatan || '';
+  el('wp-shopee-modal-status').textContent = '';
+  el('wp-shopee-modal').style.display = 'flex';
+}
+
+function wpTutupModalShopee() {
+  el('wp-shopee-modal').style.display = 'none';
+  wpShopeeRowAktif = null;
+}
+
+async function wpSimpanDataPembeliShopee() {
+  if (!wpShopeeRowAktif) return;
+  const statusEl = el('wp-shopee-modal-status');
+  setLoadingDots(statusEl, 'Menyimpan');
+  try {
+    const data = await postJson({
+      aksi: 'input_data_pembeli_shopee', row: wpShopeeRowAktif,
+      usernameManual: el('wp-shopee-modal-username').value.trim(),
+      namaManual: el('wp-shopee-modal-nama').value.trim(), hpManual: el('wp-shopee-modal-hp').value.trim(),
+      alamatManual: el('wp-shopee-modal-alamat').value.trim(), catatan: el('wp-shopee-modal-catatan').value.trim(),
+      email: currentUserEmail()
+    });
+    stopLoadingDots(statusEl);
+    if (data.success) {
+      playBeep();
+      statusEl.textContent = '✓ Tersimpan';
+      statusEl.className = 'status-text ok';
+      setTimeout(() => { wpTutupModalShopee(); wpFetchPesananShopee(); }, 600);
+    } else { statusEl.textContent = '✗ Gagal: ' + (data.error || ''); statusEl.className = 'status-text err'; }
+  } catch (err) { stopLoadingDots(statusEl); statusEl.textContent = '✗ Gagal terhubung: ' + err.message; statusEl.className = 'status-text err'; }
+}
+
+async function wpSyncPesananShopee() {
+  const btn = el('wp-shopee-sync-btn');
+  if (btn.disabled) return;
+  const statusEl = el('wp-shopee-sync-status');
+  btn.disabled = true;
+  setLoadingDots(statusEl, 'Sinkronisasi');
+  try {
+    const data = await postJson({ aksi: 'sync_pesanan_shopee', email: currentUserEmail() }, 300000); // bisa lama kalau pesanan banyak, kasih timeout lega
+    stopLoadingDots(statusEl);
+    btn.disabled = false;
+    if (data.success) {
+      playBeep();
+      statusEl.textContent = `✓ ${data.jumlahBaru} pesanan baru${data.masihAdaLagi ? ' (masih ada sisa, klik Sync lagi buat lanjutin)' : ''}`;
+      statusEl.style.color = '';
+      wpFetchPesananShopee();
+    } else {
+      statusEl.textContent = '✗ ' + (data.error || '');
+      statusEl.style.color = 'var(--web-danger)';
+    }
+  } catch (err) {
+    stopLoadingDots(statusEl);
+    btn.disabled = false;
+    statusEl.textContent = '✗ Gagal terhubung: ' + err.message;
+    statusEl.style.color = 'var(--web-danger)';
+  }
 }
 
 /* ===== Semua Pesanan (gabungan lintas channel) ===== */
@@ -6373,43 +6512,41 @@ function wpCetakInvoiceTikTok(o) {
 }
 
 function wpPengirimanGantiTab(tab) {
-  ['keluar', 'masuk', 'pending', 'finalisasi'].forEach(t => {
+  ['keluar', 'masuk'].forEach(t => {
     el('wp-pgr-tab-' + t).classList.toggle('active', t === tab);
     el('wp-pgr-view-' + t).style.display = t === tab ? 'block' : 'none';
   });
   if (tab === 'keluar') wpFetchLogResiKeluar();
   else if (tab === 'masuk') wpFetchLogResiMasuk();
-  else if (tab === 'pending') wpFetchPesananPending();
-  else if (tab === 'finalisasi') wpFetchPengiriman();
 }
 
 let wpLogKeluarCache = [];
 let wpLogKeluarPaginasiState = buatStatePaginasi();
 
 async function wpFetchLogResiKeluar() {
-  el('wp-logkeluar-body').innerHTML = '<tr><td colspan="7" style="text-align:center; color:var(--web-text-dim);">Memuat...</td></tr>';
+  el('wp-logkeluar-body').innerHTML = '<tr><td colspan="6" style="text-align:center; color:var(--web-text-dim);">Memuat...</td></tr>';
   try {
     const data = await postJson({ aksi: 'lihat_log_resi_keluar', email: currentUserEmail() });
-    if (!data.success) { el('wp-logkeluar-body').innerHTML = `<tr><td colspan="7" style="text-align:center; color:var(--web-danger);">Gagal: ${escapeHtml(data.error||'')}</td></tr>`; return; }
+    if (!data.success) { el('wp-logkeluar-body').innerHTML = `<tr><td colspan="6" style="text-align:center; color:var(--web-danger);">Gagal: ${escapeHtml(data.error||'')}</td></tr>`; return; }
     wpLogKeluarCache = data.daftar || [];
     wpLogKeluarRenderHalaman();
   } catch (err) {
-    el('wp-logkeluar-body').innerHTML = `<tr><td colspan="7" style="text-align:center; color:var(--web-danger);">Gagal terhubung: ${escapeHtml(err.message)}</td></tr>`;
+    el('wp-logkeluar-body').innerHTML = `<tr><td colspan="6" style="text-align:center; color:var(--web-danger);">Gagal terhubung: ${escapeHtml(err.message)}</td></tr>`;
   }
 }
 
 function wpLogKeluarRenderHalaman() {
   el('wp-logkeluar-empty').style.display = wpLogKeluarCache.length === 0 ? 'block' : 'none';
   const halamanIni = halamanDataPaginasi(wpLogKeluarCache, wpLogKeluarPaginasiState);
+  const PILL_STATUS = { 'Menunggu Kurir': 'aktif', 'Dalam Pengiriman': 'dikirim', 'Pesanan Selesai': 'dikirim', 'Retur': 'batal' };
   el('wp-logkeluar-body').innerHTML = halamanIni.map(d => `
     <tr>
       <td style="font-size:11.5px;">${escapeHtml(d.noResiScan)}</td>
       <td style="font-size:11px; color:var(--web-text-dim);">${escapeHtml(d.tanggal)}</td>
       <td style="font-size:11px;">${escapeHtml(d.kurir || '-')}</td>
       <td style="font-size:11.5px; font-weight:600;">${d.noInvoice ? escapeHtml(d.noInvoice) : '<span style="color:var(--web-danger);">Nggak cocok</span>'}</td>
-      <td>${d.pembeli ? escapeHtml(d.pembeli) : '-'}</td>
-      <td>${d.statusPesanan ? `<span class="web-status-pill dikirim">${escapeHtml(d.statusPesanan)}</span>` : '-'}</td>
-      <td style="font-size:11px; color:var(--web-text-dim);">${escapeHtml(d.dicatatOleh || '-')}</td>
+      <td><span class="web-status-pill ${PILL_STATUS[d.statusPesanan] || 'aktif'}">${escapeHtml(d.statusPesanan)}</span></td>
+      <td style="font-size:11.5px;">${d.resiRetur ? escapeHtml(d.resiRetur) : '-'}</td>
     </tr>
   `).join('');
   renderPaginasi('wp-logkeluar-paginasi', wpLogKeluarCache.length, wpLogKeluarPaginasiState, wpLogKeluarRenderHalaman);
@@ -6419,29 +6556,29 @@ let wpLogMasukCache = [];
 let wpLogMasukPaginasiState = buatStatePaginasi();
 
 async function wpFetchLogResiMasuk() {
-  el('wp-logmasuk-body').innerHTML = '<tr><td colspan="7" style="text-align:center; color:var(--web-text-dim);">Memuat...</td></tr>';
+  el('wp-logmasuk-body').innerHTML = '<tr><td colspan="6" style="text-align:center; color:var(--web-text-dim);">Memuat...</td></tr>';
   try {
     const data = await postJson({ aksi: 'lihat_log_resi_masuk', email: currentUserEmail() });
-    if (!data.success) { el('wp-logmasuk-body').innerHTML = `<tr><td colspan="7" style="text-align:center; color:var(--web-danger);">Gagal: ${escapeHtml(data.error||'')}</td></tr>`; return; }
+    if (!data.success) { el('wp-logmasuk-body').innerHTML = `<tr><td colspan="6" style="text-align:center; color:var(--web-danger);">Gagal: ${escapeHtml(data.error||'')}</td></tr>`; return; }
     wpLogMasukCache = data.daftar || [];
     wpLogMasukRenderHalaman();
   } catch (err) {
-    el('wp-logmasuk-body').innerHTML = `<tr><td colspan="7" style="text-align:center; color:var(--web-danger);">Gagal terhubung: ${escapeHtml(err.message)}</td></tr>`;
+    el('wp-logmasuk-body').innerHTML = `<tr><td colspan="6" style="text-align:center; color:var(--web-danger);">Gagal terhubung: ${escapeHtml(err.message)}</td></tr>`;
   }
 }
 
 function wpLogMasukRenderHalaman() {
   el('wp-logmasuk-empty').style.display = wpLogMasukCache.length === 0 ? 'block' : 'none';
   const halamanIni = halamanDataPaginasi(wpLogMasukCache, wpLogMasukPaginasiState);
+  const PILL_STATUS = { 'Menunggu Kurir': 'aktif', 'Dalam Pengiriman': 'dikirim', 'Pesanan Selesai': 'dikirim', 'Retur': 'batal' };
   el('wp-logmasuk-body').innerHTML = halamanIni.map(d => `
     <tr>
       <td style="font-size:11.5px;">${escapeHtml(d.noResiScan)}</td>
       <td style="font-size:11px; color:var(--web-text-dim);">${escapeHtml(d.tanggal)}</td>
       <td style="font-size:11px;">${escapeHtml(d.kurir || '-')}</td>
       <td style="font-size:11.5px; font-weight:600;">${d.noInvoice ? escapeHtml(d.noInvoice) : '<span style="color:var(--web-danger);">Nggak cocok</span>'}</td>
-      <td>${d.pembeli ? escapeHtml(d.pembeli) : '-'}</td>
-      <td>${d.cocokRetur ? '<span class="web-status-pill selisih">✓ Retur</span>' : '<span style="color:var(--web-text-dim); font-size:11px;">Belum ditandai Retur</span>'}</td>
-      <td style="font-size:11px; color:var(--web-text-dim);">${escapeHtml(d.dicatatOleh || '-')}</td>
+      <td><span class="web-status-pill ${PILL_STATUS[d.statusPesanan] || 'batal'}">${escapeHtml(d.statusPesanan)}</span></td>
+      <td style="font-size:11.5px;">${d.resiRetur ? escapeHtml(d.resiRetur) : '-'}</td>
     </tr>
   `).join('');
   renderPaginasi('wp-logmasuk-paginasi', wpLogMasukCache.length, wpLogMasukPaginasiState, wpLogMasukRenderHalaman);
