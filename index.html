@@ -1124,7 +1124,7 @@ const LOGO_OMI_B64 = "/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAMCAgMCAgMDAwMEAwMEBQgFBQ
     <button class="user-menu-item" id="btn-kelola-akses" style="display:none;" onclick="bukaKelolaAkses()">🔑 Kelola Akses Staff</button>
     <button class="user-menu-item" onclick="bukaWebDariMobile()">🖥️ Buka Versi Web</button>
     <button class="user-menu-item" onclick="bukaTesBluetooth()">🔵 Tes Print Bluetooth (Eksperimental)</button>
-    <button class="user-menu-item" onclick="logout()">🚪 Logout</button>
+    <button class="user-menu-item" onclick="logout()">Logout</button>
   </div>
 
   <main>
@@ -1165,7 +1165,7 @@ const LOGO_OMI_B64 = "/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAMCAgMCAgMDAwMEAwMEBQgFBQ
         Akun kamu sudah terdaftar, tapi belum diaktifkan sama Owner. Hubungi Owner buat minta akses.
       </div>
       <button class="back-btn" onclick="ceklagiStatusAkses()">🔄 Cek Lagi Status</button>
-      <button class="back-btn" onclick="logout()">🚪 Logout</button>
+      <button class="back-btn" onclick="logout()">Logout</button>
     </div>
 
     <!-- LAYAR KELOLA AKSES (khusus Owner) -->
@@ -1910,7 +1910,7 @@ const LOGO_OMI_B64 = "/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAMCAgMCAgMDAwMEAwMEBQgFBQ
             <button class="web-nav-item web-nav-sub" data-katsub="harga" onclick="katalogBukaSub('harga')">Harga</button>
             <button class="web-nav-item web-nav-sub" data-katsub="promosi" onclick="katalogBukaSub('promosi')">Promosi</button>
             <button class="web-nav-item web-nav-sub" data-katsub="kategori" onclick="katalogBukaSub('kategori')">Kategori</button>
-            <button class="web-nav-item web-nav-sub" data-katsub="dashboard" onclick="katalogBukaSub('dashboard')">📊 Laporan</button>
+            <button class="web-nav-item web-nav-sub" data-katsub="dashboard" onclick="katalogBukaSub('dashboard')">Laporan</button>
           </div>
         </div>
         <div class="web-nav-group">
@@ -1928,8 +1928,18 @@ const LOGO_OMI_B64 = "/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAMCAgMCAgMDAwMEAwMEBQgFBQ
           <div class="web-submenu-wrap">
             <button class="web-nav-item web-nav-sub" data-wpsub="kontak" onclick="wpBukaSubMenu('kontak')">Kontak Pelanggan</button>
             <button class="web-nav-item web-nav-sub" data-wpsub="semua" onclick="wpBukaSubMenu('semua')">Transaksi Penjualan</button>
-            <button class="web-nav-item web-nav-sub" data-wpsub="pengiriman" onclick="wpBukaSubMenu('pengiriman')">Pengiriman</button>
-            <button class="web-nav-item web-nav-sub" data-wpsub="dashboard" onclick="wpBukaSubMenu('dashboard')">📊 Laporan</button>
+            <button class="web-nav-item web-nav-sub" data-wpsub="dashboard" onclick="wpBukaSubMenu('dashboard')">Laporan</button>
+          </div>
+        </div>
+        <div class="web-nav-group">
+          <button class="web-nav-item" data-tab="pengiriman" onclick="toggleNavGroup(this); pengirimanBukaSub('belum-selesai')">Pengiriman</button>
+          <div class="web-submenu-wrap">
+            <button class="web-nav-item web-nav-sub" data-pgrsub="belum-selesai" onclick="pengirimanBukaSub('belum-selesai')">Belum Selesai</button>
+            <button class="web-nav-item web-nav-sub" data-pgrsub="perlu-dicek" onclick="pengirimanBukaSub('perlu-dicek')">Perlu Dicek</button>
+            <button class="web-nav-item web-nav-sub" data-pgrsub="selesai" onclick="pengirimanBukaSub('selesai')">Selesai</button>
+            <button class="web-nav-item web-nav-sub" data-pgrsub="komplain-batal" onclick="pengirimanBukaSub('komplain-batal')">Komplain / Batal</button>
+            <button class="web-nav-item web-nav-sub" data-pgrsub="semua-log" onclick="pengirimanBukaSub('semua-log')">Semua Log Resi</button>
+            <button class="web-nav-item web-nav-sub" data-pgrsub="resi-masuk" onclick="pengirimanBukaSub('resi-masuk')">Resi Masuk (Retur)</button>
           </div>
         </div>
         <div class="web-nav-group">
@@ -2004,11 +2014,11 @@ const LOGO_OMI_B64 = "/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAMCAgMCAgMDAwMEAwMEBQgFBQ
               <span style="display:flex; align-items:center; gap:5px;"><span style="font-size:11.5px;">Light Mode</span> ☀️</span>
             </div>
             <div class="web-user-menu-divider"></div>
-            <button class="web-nav-item" data-tab="pengaturan" id="btn-nav-pengaturan" style="display:none;" onclick="gantiTabWeb('pengaturan'); pgtBukaSubMenu('tampilan')">⚙️ Pengaturan</button>
-            <button class="web-nav-item" data-tab="pesandev" id="btn-nav-pesandev" style="display:none;" onclick="gantiTabWeb('pesandev')">💬 Pesan Dari Pengguna</button>
+            <button class="web-nav-item" data-tab="pengaturan" id="btn-nav-pengaturan" style="display:none;" onclick="gantiTabWeb('pengaturan'); pgtBukaSubMenu('tampilan')">Pengaturan</button>
+            <button class="web-nav-item" data-tab="pesandev" id="btn-nav-pesandev" style="display:none;" onclick="gantiTabWeb('pesandev')">Pesan Dari Pengguna</button>
             <div class="web-user-menu-divider"></div>
-            <button class="web-nav-item" onclick="bukaMobileDariWeb()">📱 Buka Versi Mobile</button>
-            <button class="web-nav-item" onclick="logout()">🚪 Logout</button>
+            <button class="web-nav-item" onclick="bukaMobileDariWeb()">Buka Versi Mobile</button>
+            <button class="web-nav-item" onclick="logout()">Logout</button>
           </div>
         </div>
       </div>
@@ -2365,40 +2375,6 @@ const LOGO_OMI_B64 = "/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAMCAgMCAgMDAwMEAwMEBQgFBQ
           </div>
         </div>
 
-        <div id="wp-view-pengiriman" style="display:none;">
-          <div class="web-panel-header" style="margin-bottom:6px;"><span>Pengiriman</span></div>
-          <div class="web-toolbar-row">
-            <button class="web-chart-toggle-btn active" id="wp-pgr-tab-keluar" onclick="wpPengirimanGantiTab('keluar')">Resi Keluar</button>
-            <button class="web-chart-toggle-btn" id="wp-pgr-tab-masuk" onclick="wpPengirimanGantiTab('masuk')">Resi Masuk</button>
-          </div>
-
-          <!-- TAB: RESI KELUAR -->
-          <div id="wp-pgr-view-keluar" style="margin-top:12px;">
-            <div style="font-size:11.5px; color:var(--web-text-dim); margin-bottom:10px;">Semua resi yang discan admin gudang buat pengiriman keluar, otomatis dicocokkan ke No Invoice pesanan.</div>
-            <div class="web-table-wrap">
-              <table class="web-table">
-                <thead><tr><th>No Resi</th><th>Waktu Scan</th><th>Kurir</th><th>No Invoice</th><th>Status Pesanan</th><th>Resi Retur</th></tr></thead>
-                <tbody id="wp-logkeluar-body"></tbody>
-              </table>
-            </div>
-            <div class="web-placeholder" id="wp-logkeluar-empty" style="display:none;">Belum ada resi keluar yang discan.</div>
-            <div id="wp-logkeluar-paginasi"></div>
-          </div>
-
-          <!-- TAB: RESI MASUK -->
-          <div id="wp-pgr-view-masuk" style="display:none; margin-top:12px;">
-            <div style="font-size:11.5px; color:var(--web-text-dim); margin-bottom:10px;">Resi yang discan masuk (retur/komplain), otomatis dicocokkan ke pesanan asalnya.</div>
-            <div class="web-table-wrap">
-              <table class="web-table">
-                <thead><tr><th>No Resi</th><th>Waktu Scan</th><th>Kurir</th><th>No Invoice</th><th>Status Pesanan</th><th>Resi Retur</th></tr></thead>
-                <tbody id="wp-logmasuk-body"></tbody>
-              </table>
-            </div>
-            <div class="web-placeholder" id="wp-logmasuk-empty" style="display:none;">Belum ada resi masuk yang discan.</div>
-            <div id="wp-logmasuk-paginasi"></div>
-          </div>
-        </div>
-
         <div id="wp-view-laporan-penjualan" style="display:none;">
           <div class="web-panel-header" style="margin-bottom:10px;"><span>Laporan Penjualan</span></div>
           <div class="web-kpi-grid" style="margin-bottom:16px;">
@@ -2723,6 +2699,100 @@ const LOGO_OMI_B64 = "/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAMCAgMCAgMDAwMEAwMEBQgFBQ
         </div>
 
 
+      </div>
+
+      <div class="web-tab-content" id="web-tab-pengiriman" style="display:none;">
+        <div class="web-panel-header" style="margin-bottom:6px;"><span>🚚 Pengiriman</span></div>
+        <div class="web-toolbar-row">
+          <button class="web-chart-toggle-btn active" id="pgr-tab-belum-selesai" onclick="pengirimanBukaSub('belum-selesai')">Belum Selesai</button>
+          <button class="web-chart-toggle-btn" id="pgr-tab-perlu-dicek" onclick="pengirimanBukaSub('perlu-dicek')">Perlu Dicek</button>
+          <button class="web-chart-toggle-btn" id="pgr-tab-selesai" onclick="pengirimanBukaSub('selesai')">Selesai</button>
+          <button class="web-chart-toggle-btn" id="pgr-tab-komplain-batal" onclick="pengirimanBukaSub('komplain-batal')">Komplain / Batal</button>
+          <button class="web-chart-toggle-btn" id="pgr-tab-semua-log" onclick="pengirimanBukaSub('semua-log')">Semua Log Resi</button>
+          <button class="web-chart-toggle-btn" id="pgr-tab-resi-masuk" onclick="pengirimanBukaSub('resi-masuk')">Resi Masuk (Retur)</button>
+          <div style="flex:1;"></div>
+          <span id="pgr-status-info" style="font-size:11px; color:var(--web-text-dim); align-self:center;"></span>
+          <button class="web-btn-secondary" onclick="pgrRefreshRiwayat()" style="font-size:11px; padding:4px 10px;" title="Tarik ulang data riwayat dari server (biasanya nggak perlu, cache otomatis berlaku 2 jam)">🔄</button>
+        </div>
+
+        <!-- TAB: BELUM SELESAI -->
+        <div id="pgr-view-belum-selesai" data-pgrview="belum-selesai" style="margin-top:12px;">
+          <div style="font-size:11.5px; color:var(--web-text-dim); margin-bottom:10px;">Paket yang baru discan, statusnya masih aktif (Menunggu Kurir / Dalam Pengiriman &lt; 7 hari).</div>
+          <div class="web-table-wrap">
+            <table class="web-table">
+              <thead><tr><th>No Resi</th><th>Waktu Scan</th><th>Kurir</th><th>No Invoice</th><th>Status Pesanan</th><th>Resi Retur</th></tr></thead>
+              <tbody id="pgr-body-belum-selesai"></tbody>
+            </table>
+          </div>
+          <div class="web-placeholder" id="pgr-empty-belum-selesai" style="display:none;">Nggak ada paket yang belum selesai.</div>
+          <div id="pgr-paginasi-belum-selesai"></div>
+        </div>
+
+        <!-- TAB: PERLU DICEK -->
+        <div id="pgr-view-perlu-dicek" data-pgrview="perlu-dicek" style="display:none; margin-top:12px;">
+          <div style="font-size:11.5px; color:var(--web-text-dim); margin-bottom:10px;">Udah "Dalam Pengiriman" lebih dari 7 hari - kemungkinan besar udah sampai ke pembeli tapi belum ada kepastian statusnya. Perlu dicek & difinalisasi manual.</div>
+          <div class="web-table-wrap">
+            <table class="web-table">
+              <thead><tr><th>No Resi</th><th>Waktu Scan</th><th>Kurir</th><th>No Invoice</th><th>Status Pesanan</th><th>Resi Retur</th></tr></thead>
+              <tbody id="pgr-body-perlu-dicek"></tbody>
+            </table>
+          </div>
+          <div class="web-placeholder" id="pgr-empty-perlu-dicek" style="display:none;">Nggak ada paket yang perlu dicek.</div>
+          <div id="pgr-paginasi-perlu-dicek"></div>
+        </div>
+
+        <!-- TAB: SELESAI -->
+        <div id="pgr-view-selesai" data-pgrview="selesai" style="display:none; margin-top:12px;">
+          <div style="font-size:11.5px; color:var(--web-text-dim); margin-bottom:10px;">Paket yang udah selesai (dana masuk/penghasilan tercatat). Data riwayat, dimuat dari cache lokal biar instan.</div>
+          <div class="web-table-wrap">
+            <table class="web-table">
+              <thead><tr><th>No Resi</th><th>Waktu Scan</th><th>Kurir</th><th>No Invoice</th><th>Status Pesanan</th><th>Resi Retur</th></tr></thead>
+              <tbody id="pgr-body-selesai"></tbody>
+            </table>
+          </div>
+          <div class="web-placeholder" id="pgr-empty-selesai" style="display:none;">Belum ada paket yang selesai.</div>
+          <div id="pgr-paginasi-selesai"></div>
+        </div>
+
+        <!-- TAB: KOMPLAIN / BATAL -->
+        <div id="pgr-view-komplain-batal" data-pgrview="komplain-batal" style="display:none; margin-top:12px;">
+          <div style="font-size:11.5px; color:var(--web-text-dim); margin-bottom:10px;">Paket bermasalah, komplain, atau retur/batal. Data riwayat, dimuat dari cache lokal biar instan.</div>
+          <div class="web-table-wrap">
+            <table class="web-table">
+              <thead><tr><th>No Resi</th><th>Waktu Scan</th><th>Kurir</th><th>No Invoice</th><th>Status Pesanan</th><th>Resi Retur</th></tr></thead>
+              <tbody id="pgr-body-komplain-batal"></tbody>
+            </table>
+          </div>
+          <div class="web-placeholder" id="pgr-empty-komplain-batal" style="display:none;">Belum ada komplain/batal.</div>
+          <div id="pgr-paginasi-komplain-batal"></div>
+        </div>
+
+        <!-- TAB: SEMUA LOG RESI -->
+        <div id="pgr-view-semua-log" data-pgrview="semua-log" style="display:none; margin-top:12px;">
+          <div style="font-size:11.5px; color:var(--web-text-dim); margin-bottom:10px;">Seluruh log resi keluar, gabungan aktif + riwayat.</div>
+          <input type="text" id="pgr-semua-cari" class="web-search-input" placeholder="🔍 Cari No Resi / No Pesanan..." oninput="pgrPaginasiState.page = 1; wpRenderPengirimanTab();" style="max-width:260px;" />
+          <div class="web-table-wrap">
+            <table class="web-table">
+              <thead><tr><th>No Resi</th><th>Waktu Scan</th><th>No Pesanan</th><th>Channel Penjualan</th><th>Status Terakhir</th></tr></thead>
+              <tbody id="pgr-body-semua-log"></tbody>
+            </table>
+          </div>
+          <div class="web-placeholder" id="pgr-empty-semua-log" style="display:none;">Belum ada log resi.</div>
+          <div id="pgr-paginasi-semua-log"></div>
+        </div>
+
+        <!-- TAB: RESI MASUK (RETUR) - dipertahankan buat kontinuitas fitur scan retur -->
+        <div id="pgr-view-resi-masuk" data-pgrview="resi-masuk" style="display:none; margin-top:12px;">
+          <div style="font-size:11.5px; color:var(--web-text-dim); margin-bottom:10px;">Resi yang discan masuk (retur/komplain), otomatis dicocokkan ke pesanan asalnya.</div>
+          <div class="web-table-wrap">
+            <table class="web-table">
+              <thead><tr><th>No Resi</th><th>Waktu Scan</th><th>Kurir</th><th>No Invoice</th><th>Status Pesanan</th><th>Resi Retur</th></tr></thead>
+              <tbody id="wp-logmasuk-body"></tbody>
+            </table>
+          </div>
+          <div class="web-placeholder" id="wp-logmasuk-empty" style="display:none;">Belum ada resi masuk yang discan.</div>
+          <div id="wp-logmasuk-paginasi"></div>
+        </div>
       </div>
 
       <div class="web-tab-content" id="web-tab-pembelian" style="display:none;">
@@ -4925,7 +4995,7 @@ function gantiTabWeb(tab) {
   document.querySelectorAll('.web-tab-content').forEach(div => { div.style.display = 'none'; });
   el('web-tab-' + tab).style.display = 'block';
 
-  const judul = { overview: 'Beranda', pesanan: 'Penjualan', pembelian: 'Pembelian', stock: 'Stock', invoicesupplier: 'Invoice Supplier', staff: 'Kelola Akses' };
+  const judul = { overview: 'Beranda', pesanan: 'Penjualan', pengiriman: 'Pengiriman', pembelian: 'Pembelian', stock: 'Stock', invoicesupplier: 'Invoice Supplier', staff: 'Kelola Akses' };
   el('web-page-title').textContent = judul[tab] || tab;
 
   if (tab === 'overview') {
@@ -4953,7 +5023,7 @@ function gantiTabWeb(tab) {
   } else {
     const div = el('web-tab-' + tab);
     if (!div.innerHTML.trim()) {
-      div.innerHTML = '<div class="web-placeholder">Halaman ini masih pakai tampilan mobile untuk sekarang.<br><br><button class="web-nav-item" style="display:inline-flex; border:1px solid var(--web-border); border-radius:8px;" onclick="bukaMobileDariWeb()">📱 Buka di Tampilan Mobile</button></div>';
+      div.innerHTML = '<div class="web-placeholder">Halaman ini masih pakai tampilan mobile untuk sekarang.<br><br><button class="web-nav-item" style="display:inline-flex; border:1px solid var(--web-border); border-radius:8px;" onclick="bukaMobileDariWeb()">Buka di Tampilan Mobile</button></div>';
     }
   }
 }
@@ -5342,14 +5412,13 @@ function wpBukaSubMenu(sub) {
   gantiTabWeb('pesanan');
   document.querySelectorAll('.web-nav-sub[data-wpsub]').forEach(btn => btn.classList.toggle('active', btn.dataset.wpsub === sub));
 
-  const petaView = { dashboard: 'wp-view-dashboard-penjualan', kontak: 'wp-view-pelanggan', semua: 'wp-view-semua-gabungan', pengiriman: 'wp-view-pengiriman', laporanjual: 'wp-view-laporan-penjualan', website: 'wp-view-website', posales: 'wp-view-posales' };
-  ['wp-view-dashboard-penjualan', 'wp-view-pelanggan', 'wp-view-semua-gabungan', 'wp-view-pengiriman', 'wp-view-laporan-penjualan', 'wp-view-tiktok', 'wp-view-shopee', 'wp-view-website', 'wp-view-posales', 'wp-view-detail'].forEach(id => { if (el(id)) el(id).style.display = 'none'; });
+  const petaView = { dashboard: 'wp-view-dashboard-penjualan', kontak: 'wp-view-pelanggan', semua: 'wp-view-semua-gabungan', laporanjual: 'wp-view-laporan-penjualan', website: 'wp-view-website', posales: 'wp-view-posales' };
+  ['wp-view-dashboard-penjualan', 'wp-view-pelanggan', 'wp-view-semua-gabungan', 'wp-view-laporan-penjualan', 'wp-view-tiktok', 'wp-view-shopee', 'wp-view-website', 'wp-view-posales', 'wp-view-detail'].forEach(id => { if (el(id)) el(id).style.display = 'none'; });
   el(petaView[sub]).style.display = 'block';
 
   if (sub === 'dashboard') { wpHentikanAutoRefreshTikTok(); wpHentikanAutoRefreshGabungan(); wpFetchDashboardPenjualan(); }
   else if (sub === 'kontak') { wpHentikanAutoRefreshTikTok(); wpHentikanAutoRefreshGabungan(); wpFetchPelanggan(); }
   else if (sub === 'semua') { wpHentikanAutoRefreshTikTok(); wpGabunganSubTab('pantauan'); }
-  else if (sub === 'pengiriman') { wpHentikanAutoRefreshTikTok(); wpHentikanAutoRefreshGabungan(); wpPengirimanGantiTab('keluar'); }
   else if (sub === 'laporanjual') { wpHentikanAutoRefreshTikTok(); wpHentikanAutoRefreshGabungan(); wpFetchLaporanPenjualan(); }
   else if (sub === 'posales') { wpHentikanAutoRefreshTikTok(); wpHentikanAutoRefreshGabungan(); wpPosalesGantiTab('semua'); }
   else { wpHentikanAutoRefreshTikTok(); wpHentikanAutoRefreshGabungan(); }
@@ -6529,45 +6598,115 @@ function wpCetakInvoiceTikTok(o) {
   bukaPrintDiTabBaru('print-invoice-pages', o.noReferensi + ' - Invoice TikTok Shop');
 }
 
-function wpPengirimanGantiTab(tab) {
-  ['keluar', 'masuk'].forEach(t => {
-    el('wp-pgr-tab-' + t).classList.toggle('active', t === tab);
-    el('wp-pgr-view-' + t).style.display = t === tab ? 'block' : 'none';
+/* ===== Pengiriman - menu utama sendiri, 5 tab klasifikasi + Resi Masuk =====
+   Data "aktif" (Belum Selesai/Perlu Dicek) selalu difetch fresh - ini yang actionable & berubah.
+   Data "riwayat" (Selesai/Komplain-Batal) di-cache localStorage 2 jam - datanya udah final,
+   nggak perlu ditarik ulang tiap buka tab (biar nggak bebanin Apps Script/nge-lag). */
+let wpPengirimanSubAktif = 'belum-selesai';
+let wpPengirimanAktifCache = null;
+let wpPengirimanRiwayatCache = null;
+let pgrPaginasiState = buatStatePaginasi();
+
+async function pengirimanBukaSub(sub) {
+  gantiTabWeb('pengiriman');
+  wpPengirimanSubAktif = sub;
+  simpanLokasiTerakhir('pengiriman', sub);
+  document.querySelectorAll('.web-nav-sub[data-pgrsub]').forEach(btn => btn.classList.toggle('active', btn.dataset.pgrsub === sub));
+  document.querySelectorAll('#pgr-tab-belum-selesai, #pgr-tab-perlu-dicek, #pgr-tab-selesai, #pgr-tab-komplain-batal, #pgr-tab-semua-log, #pgr-tab-resi-masuk').forEach(btn => {
+    btn.classList.toggle('active', btn.id === 'pgr-tab-' + sub);
   });
-  if (tab === 'keluar') wpFetchLogResiKeluar();
-  else if (tab === 'masuk') wpFetchLogResiMasuk();
-}
+  document.querySelectorAll('#web-tab-pengiriman [data-pgrview]').forEach(div => { div.style.display = div.dataset.pgrview === sub ? 'block' : 'none'; });
+  pgrPaginasiState.page = 1;
 
-let wpLogKeluarCache = [];
-let wpLogKeluarPaginasiState = buatStatePaginasi();
+  if (sub === 'resi-masuk') { wpFetchLogResiMasuk(); return; }
 
-async function wpFetchLogResiKeluar() {
-  el('wp-logkeluar-body').innerHTML = '<tr><td colspan="6" style="text-align:center; color:var(--web-text-dim);">Memuat...</td></tr>';
-  try {
-    const data = await postJson({ aksi: 'lihat_log_resi_keluar', email: currentUserEmail() });
-    if (!data.success) { el('wp-logkeluar-body').innerHTML = `<tr><td colspan="6" style="text-align:center; color:var(--web-danger);">Gagal: ${escapeHtml(data.error||'')}</td></tr>`; return; }
-    wpLogKeluarCache = data.daftar || [];
-    wpLogKeluarRenderHalaman();
-  } catch (err) {
-    el('wp-logkeluar-body').innerHTML = `<tr><td colspan="6" style="text-align:center; color:var(--web-danger);">Gagal terhubung: ${escapeHtml(err.message)}</td></tr>`;
+  const statusEl = el('pgr-status-info');
+  statusEl.textContent = '';
+  if (sub === 'selesai' || sub === 'komplain-batal' || sub === 'semua-log') {
+    if (wpPengirimanRiwayatCache === null) {
+      const dariCache = ambilCacheTTL('log_resi_riwayat');
+      if (dariCache) {
+        wpPengirimanRiwayatCache = dariCache;
+        statusEl.textContent = '(dari cache lokal)';
+      } else {
+        await wpMuatRiwayatPengiriman();
+      }
+    }
   }
+  if (sub !== 'selesai' && sub !== 'komplain-batal') {
+    if (wpPengirimanAktifCache === null) await wpMuatAktifPengiriman();
+  }
+  wpRenderPengirimanTab();
 }
 
-function wpLogKeluarRenderHalaman() {
-  el('wp-logkeluar-empty').style.display = wpLogKeluarCache.length === 0 ? 'block' : 'none';
-  const halamanIni = halamanDataPaginasi(wpLogKeluarCache, wpLogKeluarPaginasiState);
-  const PILL_STATUS = { 'Menunggu Kurir': 'aktif', 'Dalam Pengiriman': 'dikirim', 'Pesanan Selesai': 'dikirim', 'Retur': 'batal' };
-  el('wp-logkeluar-body').innerHTML = halamanIni.map(d => `
+async function wpMuatAktifPengiriman() {
+  try {
+    const data = await postJson({ aksi: 'lihat_log_resi_aktif', email: currentUserEmail() });
+    if (data.success) wpPengirimanAktifCache = data.daftar || [];
+  } catch (err) {}
+}
+
+async function wpMuatRiwayatPengiriman() {
+  try {
+    const data = await postJson({ aksi: 'lihat_log_resi_riwayat', email: currentUserEmail() });
+    if (data.success) {
+      wpPengirimanRiwayatCache = data.daftar || [];
+      simpanCacheTTL('log_resi_riwayat', wpPengirimanRiwayatCache, 120); // 2 jam - data final, jarang berubah
+    }
+  } catch (err) {}
+}
+
+async function pgrRefreshRiwayat() {
+  hapusCacheTTL('log_resi_riwayat');
+  wpPengirimanRiwayatCache = null;
+  await wpMuatRiwayatPengiriman();
+  wpRenderPengirimanTab();
+}
+
+const PGR_KATEGORI_MAP = { 'belum-selesai': 'Belum Selesai', 'perlu-dicek': 'Perlu Dicek', 'selesai': 'Selesai', 'komplain-batal': 'Komplain/Batal' };
+const PGR_PILL_STATUS = { 'Menunggu Kurir': 'aktif', 'Dalam Pengiriman': 'dikirim', 'Pesanan Selesai': 'dikirim', 'Retur': 'batal' };
+
+function wpRenderPengirimanTab() {
+  const sub = wpPengirimanSubAktif;
+  if (sub === 'semua-log') { wpRenderSemuaLogResi(); return; }
+  if (sub === 'resi-masuk') return; // ditangani wpLogMasukRenderHalaman sendiri
+
+  const kategoriTarget = PGR_KATEGORI_MAP[sub];
+  const sumberData = (sub === 'selesai' || sub === 'komplain-batal') ? (wpPengirimanRiwayatCache || []) : (wpPengirimanAktifCache || []);
+  const daftar = sumberData.filter(d => d.kategoriPengiriman === kategoriTarget);
+
+  el('pgr-empty-' + sub).style.display = daftar.length === 0 ? 'block' : 'none';
+  const halamanIni = halamanDataPaginasi(daftar, pgrPaginasiState);
+  el('pgr-body-' + sub).innerHTML = halamanIni.map(d => `
     <tr>
       <td style="font-size:11.5px;">${escapeHtml(d.noResiScan)}</td>
       <td style="font-size:11px; color:var(--web-text-dim);">${escapeHtml(d.tanggal)}</td>
       <td style="font-size:11px;">${escapeHtml(d.kurir || '-')}</td>
       <td style="font-size:11.5px; font-weight:600;">${d.noInvoice ? escapeHtml(d.noInvoice) : '<span style="color:var(--web-danger);">Nggak cocok</span>'}</td>
-      <td><span class="web-status-pill ${PILL_STATUS[d.statusPesanan] || 'aktif'}">${escapeHtml(d.statusPesanan)}</span></td>
+      <td><span class="web-status-pill ${PGR_PILL_STATUS[d.statusPesanan] || 'aktif'}">${escapeHtml(d.statusPesanan)}</span></td>
       <td style="font-size:11.5px;">${d.resiRetur ? escapeHtml(d.resiRetur) : '-'}</td>
     </tr>
   `).join('');
-  renderPaginasi('wp-logkeluar-paginasi', wpLogKeluarCache.length, wpLogKeluarPaginasiState, wpLogKeluarRenderHalaman);
+  renderPaginasi('pgr-paginasi-' + sub, daftar.length, pgrPaginasiState, wpRenderPengirimanTab);
+}
+
+function wpRenderSemuaLogResi() {
+  const cari = (el('pgr-semua-cari')?.value || '').toLowerCase().trim();
+  let gabungan = [...(wpPengirimanAktifCache || []), ...(wpPengirimanRiwayatCache || [])];
+  if (cari) gabungan = gabungan.filter(d => d.noResiScan.toLowerCase().includes(cari) || (d.noInvoice || '').toLowerCase().includes(cari));
+
+  el('pgr-empty-semua-log').style.display = gabungan.length === 0 ? 'block' : 'none';
+  const halamanIni = halamanDataPaginasi(gabungan, pgrPaginasiState);
+  el('pgr-body-semua-log').innerHTML = halamanIni.map(d => `
+    <tr>
+      <td style="font-size:11.5px;">${escapeHtml(d.noResiScan)}</td>
+      <td style="font-size:11px; color:var(--web-text-dim);">${escapeHtml(d.tanggal)}</td>
+      <td style="font-size:11.5px; font-weight:600;">${d.noInvoice ? escapeHtml(d.noInvoice) : '-'}</td>
+      <td style="font-size:11.5px;">${d.sumber ? escapeHtml(d.sumber) : '<span style="color:var(--web-text-dim);">Nggak diketahui</span>'}</td>
+      <td><span class="web-status-pill ${PGR_PILL_STATUS[d.statusPesanan] || 'aktif'}">${escapeHtml(d.statusPesanan)}</span></td>
+    </tr>
+  `).join('');
+  renderPaginasi('pgr-paginasi-semua-log', gabungan.length, pgrPaginasiState, wpRenderPengirimanTab);
 }
 
 let wpLogMasukCache = [];
@@ -6588,14 +6727,13 @@ async function wpFetchLogResiMasuk() {
 function wpLogMasukRenderHalaman() {
   el('wp-logmasuk-empty').style.display = wpLogMasukCache.length === 0 ? 'block' : 'none';
   const halamanIni = halamanDataPaginasi(wpLogMasukCache, wpLogMasukPaginasiState);
-  const PILL_STATUS = { 'Menunggu Kurir': 'aktif', 'Dalam Pengiriman': 'dikirim', 'Pesanan Selesai': 'dikirim', 'Retur': 'batal' };
   el('wp-logmasuk-body').innerHTML = halamanIni.map(d => `
     <tr>
       <td style="font-size:11.5px;">${escapeHtml(d.noResiScan)}</td>
       <td style="font-size:11px; color:var(--web-text-dim);">${escapeHtml(d.tanggal)}</td>
       <td style="font-size:11px;">${escapeHtml(d.kurir || '-')}</td>
       <td style="font-size:11.5px; font-weight:600;">${d.noInvoice ? escapeHtml(d.noInvoice) : '<span style="color:var(--web-danger);">Nggak cocok</span>'}</td>
-      <td><span class="web-status-pill ${PILL_STATUS[d.statusPesanan] || 'batal'}">${escapeHtml(d.statusPesanan)}</span></td>
+      <td><span class="web-status-pill ${PGR_PILL_STATUS[d.statusPesanan] || 'batal'}">${escapeHtml(d.statusPesanan)}</span></td>
       <td style="font-size:11.5px;">${d.resiRetur ? escapeHtml(d.resiRetur) : '-'}</td>
     </tr>
   `).join('');
