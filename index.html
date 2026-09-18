@@ -1928,8 +1928,6 @@ const LOGO_OMI_B64 = "/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAMCAgMCAgMDAwMEAwMEBQgFBQ
           <div class="web-submenu-wrap">
             <button class="web-nav-item web-nav-sub" data-wpsub="kontak" onclick="wpBukaSubMenu('kontak')">Kontak Pelanggan</button>
             <button class="web-nav-item web-nav-sub" data-wpsub="semua" onclick="wpBukaSubMenu('semua')">Transaksi Penjualan</button>
-            <button class="web-nav-item web-nav-sub" data-wpsub="tiktok" onclick="wpBukaSubMenu('tiktok')">TikTok Shop</button>
-            <button class="web-nav-item web-nav-sub" data-wpsub="shopee" onclick="wpBukaSubMenu('shopee')">Shopee</button>
             <button class="web-nav-item web-nav-sub" data-wpsub="pengiriman" onclick="wpBukaSubMenu('pengiriman')">Pengiriman</button>
             <button class="web-nav-item web-nav-sub" data-wpsub="dashboard" onclick="wpBukaSubMenu('dashboard')">📊 Laporan</button>
           </div>
@@ -2175,13 +2173,10 @@ const LOGO_OMI_B64 = "/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAMCAgMCAgMDAwMEAwMEBQgFBQ
               <input type="date" id="wp-gab-tgl-akhir" class="web-form-input" style="margin:0; max-width:150px;" onchange="wpGabunganRenderHalaman()" title="Tanggal akhir" />
             </div>
             <div class="web-toolbar-row" style="margin-top:8px;">
-              <button class="web-chart-toggle-btn active" id="wp-gab-segmen-semua" onclick="wpGabunganGantiSegmen('Semua')" style="font-size:11.5px; padding:5px 10px;">Semua Pesanan</button>
-              <button class="web-chart-toggle-btn" id="wp-gab-segmen-tiktok" onclick="wpGabunganGantiSegmen('TikTok Shop')" style="font-size:11.5px; padding:5px 10px;">TikTokShop</button>
-              <button class="web-chart-toggle-btn" id="wp-gab-segmen-tokopedia" onclick="wpGabunganGantiSegmen('Tokopedia')" style="font-size:11.5px; padding:5px 10px;">Tokopedia</button>
+              <button class="web-chart-toggle-btn active" id="wp-gab-segmen-semua" onclick="wpGabunganGantiSegmen('Semua')" style="font-size:11.5px; padding:5px 10px;">Semua</button>
+              <button class="web-chart-toggle-btn" id="wp-gab-segmen-tiktok" onclick="wpGabunganGantiSegmen('TikTok Shop')" style="font-size:11.5px; padding:5px 10px;">TikTok Shop</button>
               <button class="web-chart-toggle-btn" id="wp-gab-segmen-shopee" onclick="wpGabunganGantiSegmen('Shopee')" style="font-size:11.5px; padding:5px 10px;">Shopee</button>
-              <button class="web-chart-toggle-btn" id="wp-gab-segmen-website" onclick="wpGabunganGantiSegmen('Website')" style="font-size:11.5px; padding:5px 10px;">Website</button>
-              <button class="web-chart-toggle-btn" id="wp-gab-segmen-posales" onclick="wpGabunganGantiSegmen('PO Sales')" style="font-size:11.5px; padding:5px 10px;">Order Sales</button>
-              <button class="web-chart-toggle-btn" id="wp-gab-segmen-conner" onclick="wpGabunganGantiSegmen('Conner Hardware')" style="font-size:11.5px; padding:5px 10px;">Conner Hardware</button>
+              <button class="web-chart-toggle-btn" id="wp-gab-segmen-manual" onclick="wpGabunganGantiSegmen('Order Manual')" style="font-size:11.5px; padding:5px 10px;">Order Manual</button>
               <div style="flex:1;"></div>
               <span id="wp-gab-sync-info" style="font-size:11px; color:var(--web-text-dim); align-self:center; margin-right:4px;"></span>
               <button id="wp-gab-refresh-btn" onclick="wpGabunganRefreshPesanan()" title="Tarik pesanan terbaru sekarang" style="font-size:14px; padding:5px 9px; background:transparent; border:1px solid var(--web-border); border-radius:6px; color:var(--web-text-dim); cursor:pointer; line-height:1;">🔄</button>
@@ -5347,7 +5342,7 @@ function wpBukaSubMenu(sub) {
   gantiTabWeb('pesanan');
   document.querySelectorAll('.web-nav-sub[data-wpsub]').forEach(btn => btn.classList.toggle('active', btn.dataset.wpsub === sub));
 
-  const petaView = { dashboard: 'wp-view-dashboard-penjualan', kontak: 'wp-view-pelanggan', semua: 'wp-view-semua-gabungan', pengiriman: 'wp-view-pengiriman', laporanjual: 'wp-view-laporan-penjualan', tiktok: 'wp-view-tiktok', shopee: 'wp-view-shopee', website: 'wp-view-website', posales: 'wp-view-posales' };
+  const petaView = { dashboard: 'wp-view-dashboard-penjualan', kontak: 'wp-view-pelanggan', semua: 'wp-view-semua-gabungan', pengiriman: 'wp-view-pengiriman', laporanjual: 'wp-view-laporan-penjualan', website: 'wp-view-website', posales: 'wp-view-posales' };
   ['wp-view-dashboard-penjualan', 'wp-view-pelanggan', 'wp-view-semua-gabungan', 'wp-view-pengiriman', 'wp-view-laporan-penjualan', 'wp-view-tiktok', 'wp-view-shopee', 'wp-view-website', 'wp-view-posales', 'wp-view-detail'].forEach(id => { if (el(id)) el(id).style.display = 'none'; });
   el(petaView[sub]).style.display = 'block';
 
@@ -5356,8 +5351,6 @@ function wpBukaSubMenu(sub) {
   else if (sub === 'semua') { wpHentikanAutoRefreshTikTok(); wpGabunganSubTab('pantauan'); }
   else if (sub === 'pengiriman') { wpHentikanAutoRefreshTikTok(); wpHentikanAutoRefreshGabungan(); wpPengirimanGantiTab('keluar'); }
   else if (sub === 'laporanjual') { wpHentikanAutoRefreshTikTok(); wpHentikanAutoRefreshGabungan(); wpFetchLaporanPenjualan(); }
-  else if (sub === 'tiktok') { wpHentikanAutoRefreshGabungan(); wpTiktokGantiTab('semua'); wpMulaiAutoRefreshTikTok(); }
-  else if (sub === 'shopee') { wpHentikanAutoRefreshTikTok(); wpHentikanAutoRefreshGabungan(); wpFetchPesananShopee(); }
   else if (sub === 'posales') { wpHentikanAutoRefreshTikTok(); wpHentikanAutoRefreshGabungan(); wpPosalesGantiTab('semua'); }
   else { wpHentikanAutoRefreshTikTok(); wpHentikanAutoRefreshGabungan(); }
   // website: placeholder, nggak perlu fetch apapun
@@ -6129,7 +6122,7 @@ async function wpCekPesananBaruGabungan() {
     // Cuma render ulang baris kalau lagi di halaman 1 & segmen yang relevan sama item barunya -
     // biar nggak ganggu kalau user lagi di halaman 3 misalnya.
     if (wpGabunganPaginasiState.page !== 1) return;
-    const cocokSegmenAktif = itemBaru.filter(o => wpGabunganSegmenAktif === 'Semua' || o.sumber === wpGabunganSegmenAktif);
+    const cocokSegmenAktif = itemBaru.filter(o => wpCocokSegmen(o, wpGabunganSegmenAktif));
     if (cocokSegmenAktif.length === 0) return;
 
     cocokSegmenAktif.reverse().forEach(o => {
@@ -6153,10 +6146,23 @@ async function wpCekPesananBaruGabungan() {
   } catch (err) { /* diam-diam gagal, coba lagi di siklus berikutnya */ }
 }
 
+// TikTok Shop tab juga nyakup Tokopedia (satu jalur sync yang sama). Order Manual nyakup
+// PO Sales (order offline manual) dan Website (toko online sendiri) - keduanya BUKAN marketplace.
+const SEGMEN_GROUP_MAP = {
+  'Semua': null,
+  'TikTok Shop': ['TikTok Shop', 'Tokopedia'],
+  'Shopee': ['Shopee'],
+  'Order Manual': ['PO Sales', 'Website']
+};
+function wpCocokSegmen(o, segmenAktif) {
+  const grup = SEGMEN_GROUP_MAP[segmenAktif];
+  return !grup || grup.includes(o.sumber);
+}
+
 function wpGabunganGantiSegmen(segmen) {
   wpGabunganSegmenAktif = segmen;
-  ['Semua', 'TikTok Shop', 'Tokopedia', 'Shopee', 'Website', 'PO Sales', 'Conner Hardware'].forEach(s => {
-    const idMap = { 'Semua': 'semua', 'TikTok Shop': 'tiktok', 'Tokopedia': 'tokopedia', 'Shopee': 'shopee', 'Website': 'website', 'PO Sales': 'posales', 'Conner Hardware': 'conner' };
+  const idMap = { 'Semua': 'semua', 'TikTok Shop': 'tiktok', 'Shopee': 'shopee', 'Order Manual': 'manual' };
+  Object.keys(idMap).forEach(s => {
     el('wp-gab-segmen-' + idMap[s]).classList.toggle('active', s === segmen);
   });
   wpGabunganPaginasiState.page = 1;
@@ -6198,7 +6204,7 @@ async function wpFetchArsipSelesai() {
 function wpGabunganRenderHalaman(idBaruMasuk) {
   idBaruMasuk = idBaruMasuk || [];
   const dataSumber = wpGabunganModeArsip ? wpArsipCache : wpGabunganCache.filter(o => !wpStatusSelesaiBatal(o.status));
-  let dataTerfilter = wpGabunganSegmenAktif === 'Semua' ? dataSumber : dataSumber.filter(o => o.sumber === wpGabunganSegmenAktif);
+  let dataTerfilter = dataSumber.filter(o => wpCocokSegmen(o, wpGabunganSegmenAktif));
 
   const cari = (el('wp-gab-cari')?.value || '').toLowerCase().trim();
   if (cari) dataTerfilter = dataTerfilter.filter(o => (o.noReferensi || '').toLowerCase().includes(cari) || (o.pembeli || '').toLowerCase().includes(cari));
@@ -6237,7 +6243,11 @@ function wpGabunganRenderHalaman(idBaruMasuk) {
         <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
           <button class="web-chart-toggle-btn" data-aksi="invoice" data-idx="${idx}">📋 Lihat/Cetak Invoice</button>
           <button class="web-chart-toggle-btn" data-aksi="cetak" data-idx="${idx}">📃 Cetak Surat Jalan</button>
-          ${o.rowTiktok ? `<button class="web-chart-toggle-btn" data-aksi="pembeli" data-idx="${idx}">✏️ Input Data Pembeli</button>` : ''}
+          ${(o.rowTiktok || o.rowShopee) ? `<button class="web-chart-toggle-btn" data-aksi="pembeli" data-idx="${idx}">✏️ Input Data Pembeli</button>` : ''}
+          ${(o.sumber === 'PO Sales' && o.noResi && o.noResi !== '-' && !wpStatusSelesaiBatal(o.status)) ? `
+            <button class="web-chart-toggle-btn" style="color:var(--web-accent);" data-aksi="finalselesai" data-idx="${idx}">✅ Tandai Selesai</button>
+            <button class="web-chart-toggle-btn" style="color:var(--web-danger);" data-aksi="finalretur" data-idx="${idx}">↩️ Tandai Retur</button>
+          ` : ''}
         </div>
       </td>
     </tr>
@@ -6422,6 +6432,14 @@ async function wpGabunganJalankanAksi(aksi, o) {
     }
   } else if (aksi === 'pembeli') {
     if (o.rowTiktok) wpBukaModalTikTok({ row: o.rowTiktok, orderId: o.noReferensi, usernameManual: o.usernameManual, namaManual: o.namaManual, hpManual: o.hpManual, alamatManual: o.alamatManual, catatan: o.catatan });
+    else if (o.rowShopee) wpBukaModalShopee({ row: o.rowShopee, noPesanan: o.noReferensi, usernameManual: o.usernameManual, namaManual: o.namaManual, hpManual: o.hpManual, alamatManual: o.alamatManual, catatan: o.catatan });
+  } else if (aksi === 'finalselesai' || aksi === 'finalretur') {
+    const statusBaru = aksi === 'finalselesai' ? 'Selesai' : 'Retur';
+    if (!confirm(`Tandai pesanan "${o.noReferensi}" sebagai ${statusBaru}?${statusBaru === 'Retur' ? ' Stock bakal otomatis dikembalikan.' : ' Ini bakal tercatat sebagai dana masuk/penghasilan.'}`)) return;
+    try {
+      const data = await postJson({ aksi: 'finalisasi_pengiriman', noInvoice: o.noReferensi, statusBaru, email: currentUserEmail() });
+      if (data.success) { playBeep(); wpFetchSemuaGabungan(); } else { alert('Gagal: ' + (data.error || '')); }
+    } catch (err) { alert('Gagal terhubung: ' + err.message); }
   }
 }
 
