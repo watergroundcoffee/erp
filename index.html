@@ -1052,6 +1052,61 @@ const LOGO_OMI_B64 = "/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAMCAgMCAgMDAwMEAwMEBQgFBQ
   .row-menu-panel button:hover { background: var(--web-bg); }
   .row-menu-panel button.danger { color: var(--web-danger); }
 
+  /* ===== Memo Gudang - input dual (scan/ketik + kamera), cart ala e-commerce ===== */
+  .mg-input-row { display: flex; gap: 8px; }
+  .mg-btn-kamera {
+    flex: none; padding: 0 16px; border-radius: 8px; border: 1px solid var(--web-border);
+    background: var(--web-panel); font-size: 13px; font-weight: 600; cursor: pointer; white-space: nowrap;
+  }
+  .mg-btn-kamera:hover { border-color: var(--web-info); color: var(--web-info); }
+  .mg-saran-produk {
+    margin-top: 6px; border: 1px solid var(--web-border); border-radius: 10px; overflow: hidden;
+    max-height: 220px; overflow-y: auto; background: var(--web-panel);
+  }
+  .mg-saran-item { padding: 10px 14px; cursor: pointer; font-size: 12.5px; border-bottom: 1px solid var(--web-border); }
+  .mg-saran-item:last-child { border-bottom: none; }
+  .mg-saran-item:hover { background: var(--web-bg); }
+  .mg-saran-item b { display: block; font-size: 13px; }
+  .mg-qty-stepper { display: flex; align-items: center; gap: 6px; }
+  .mg-qty-btn {
+    width: 28px; height: 28px; border-radius: 8px; border: 1px solid var(--web-border);
+    background: var(--web-panel); font-size: 16px; font-weight: 700; cursor: pointer;
+    display: flex; align-items: center; justify-content: center; line-height: 1; flex: none;
+  }
+  .mg-qty-btn:hover { background: var(--web-bg); }
+  .mg-qty-input {
+    width: 48px; text-align: center; border: 1px solid var(--web-border); border-radius: 6px;
+    padding: 5px 2px; font-size: 13px; font-weight: 700;
+  }
+  .mg-catatan-input { width: 100%; border: 1px solid var(--web-border); border-radius: 6px; padding: 6px 8px; font-size: 12px; }
+  .mg-hapus-btn { background: none; border: none; color: var(--web-danger); cursor: pointer; font-size: 15px; }
+
+  /* ===== Responsif mobile - touch target diperbesar, cart jadi kartu (bukan tabel lebar) ===== */
+  @media (max-width: 700px) {
+    .mg-input-row { flex-wrap: wrap; }
+    .mg-btn-kamera { min-height: 46px; padding: 0 20px; font-size: 14px; }
+    #mg-ms-input-sku, #mg-csm-input-sku, #mg-lhr-input-sku { min-height: 46px; font-size: 15px; flex: 1 1 160px; }
+    .mg-qty-btn { width: 40px; height: 40px; font-size: 19px; border-radius: 10px; }
+    .mg-qty-input { width: 52px; font-size: 15px; padding: 8px 2px; }
+    .mg-hapus-btn { font-size: 13px; padding: 8px 10px; min-height: 40px; border: 1px solid var(--web-border); border-radius: 8px; }
+
+    .mg-cart-table thead { display: none; }
+    .mg-cart-table, .mg-cart-table tbody, .mg-cart-table tr, .mg-cart-table td { display: block; width: 100%; }
+    .mg-cart-table { border-collapse: separate; border-spacing: 0; }
+    .mg-cart-table tr {
+      border: 1px solid var(--web-border); border-radius: 12px; margin-bottom: 10px;
+      padding: 12px; background: var(--web-panel);
+    }
+    .mg-cart-table td { border: none; padding: 7px 0; text-align: left; }
+    .mg-cart-table td[data-label]:not([data-label=""])::before {
+      content: attr(data-label); display: block; font-size: 10px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.3px; color: var(--web-text-dim); margin-bottom: 4px;
+    }
+    .mg-catatan-input, .mg-qty-stepper { width: 100%; }
+    .mg-qty-stepper { justify-content: flex-start; }
+    #mg-kamera-btn-foto { min-height: 48px; font-size: 15px; }
+  }
+
   /* ===== Pesanan Manual (web) & elemen umum tabel/form ===== */
   .web-toolbar-row { display: flex; gap: 10px; align-items: center; margin-bottom: 16px; flex-wrap: wrap; }
   .web-pagination-row { display: flex; gap: 8px; align-items: center; margin-top: 12px; }
@@ -1920,7 +1975,7 @@ const LOGO_OMI_B64 = "/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAMCAgMCAgMDAwMEAwMEBQgFBQ
             <button class="web-nav-item web-nav-sub" data-persub="monitor" onclick="persediaanBukaSub('monitor')">Monitor Stok</button>
             <button class="web-nav-item web-nav-sub" data-persub="transaksi" onclick="persediaanBukaSub('transaksi')">Transaksi Stok</button>
             <button class="web-nav-item web-nav-sub" data-persub="laporan" onclick="persediaanBukaSub('laporan')">Laporan</button>
-            <button class="web-nav-item web-nav-sub" data-persub="mintastock" onclick="persediaanBukaSub('mintastock')">Minta Stock</button>
+            <button class="web-nav-item web-nav-sub" data-persub="memogudang" onclick="persediaanBukaSub('memogudang')">Catat Memo Gudang</button>
           </div>
         </div>
         <div class="web-nav-group">
@@ -4434,6 +4489,143 @@ const LOGO_OMI_B64 = "/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAMCAgMCAgMDAwMEAwMEBQgFBQ
           </div>
           <div class="web-placeholder" id="li-empty" style="display:none;">Belum ada produk di Master Produk.</div>
           <div id="li-paginasi"></div>
+        </div>
+
+        <div id="persediaan-view-memogudang" style="display:none;">
+          <div style="display:flex; align-items:center; gap:10px; margin-bottom:10px;">
+            <button class="web-btn-secondary" style="padding:6px 12px; margin:0;" onclick="persediaanBukaSub('posisi')" title="Kembali ke Persediaan">◄ Kembali</button>
+            <div class="web-panel-header" style="margin-bottom:0;"><span>Catat Memo Gudang</span></div>
+          </div>
+          <div class="web-toolbar-row" style="margin-bottom:14px;">
+            <button class="web-chart-toggle-btn active" id="mg-tab-mintastock" onclick="mgGantiTab('mintastock')">Minta Stock</button>
+            <button class="web-chart-toggle-btn" id="mg-tab-barangmasuk" onclick="mgGantiTab('barangmasuk')">Catat Barang Masuk</button>
+            <button class="web-chart-toggle-btn" id="mg-tab-hilangrusak" onclick="mgGantiTab('hilangrusak')">Lapor Hilang/Rusak</button>
+          </div>
+
+          <!-- ===== TAB: MINTA STOCK ===== -->
+          <div id="mg-view-mintastock">
+            <div class="web-panel" style="max-width:720px;">
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                <div style="font-size:13px; font-weight:700;">Formulir Minta Stock</div>
+                <div style="font-size:11.5px; color:var(--web-text-dim);">No. <span id="mg-ms-nomor-preview">(otomatis)</span></div>
+              </div>
+              <div class="mg-input-row">
+                <input id="mg-ms-input-sku" class="web-form-input" placeholder="Scan barcode / ketik SKU / nama produk, lalu Enter..." style="margin:0;" oninput="mgCariProdukLive('mintastock')" onkeydown="if(event.key==='Enter'){event.preventDefault(); mgTambahItemDariInput('mintastock');}" />
+                <button class="mg-btn-kamera" onclick="mgBukaKamera('mintastock')" title="Scan pakai kamera">📷 Kamera</button>
+              </div>
+              <div id="mg-ms-saran" class="mg-saran-produk" style="display:none;"></div>
+
+              <div class="web-table-wrap" style="margin-top:12px; max-height:420px;">
+                <table class="web-table mg-cart-table">
+                  <thead><tr><th>SKU</th><th>Sisa Stok</th><th style="width:130px;">Qty Minta</th><th>Catatan</th><th></th></tr></thead>
+                  <tbody id="mg-ms-cart-body"></tbody>
+                </table>
+              </div>
+              <div class="web-placeholder" id="mg-ms-cart-empty">Keranjang masih kosong - scan/ketik SKU di atas buat mulai.</div>
+
+              <button class="web-btn-primary" style="width:100%; margin-top:14px;" onclick="mgKirimMemoMintaStock()">Kirim Memo Minta Stock</button>
+              <div class="status-text" id="mg-ms-status" style="text-align:left; margin-top:6px;"></div>
+            </div>
+
+            <div class="web-panel" style="max-width:720px; margin-top:14px;">
+              <div class="web-panel-header" style="margin-bottom:8px;"><span>Riwayat Memo Minta Stock</span></div>
+              <div class="web-table-wrap">
+                <table class="web-table">
+                  <thead><tr><th>No Memo</th><th>Tanggal</th><th>Status</th><th>Dibuat Oleh</th><th></th></tr></thead>
+                  <tbody id="mg-ms-riwayat-body"></tbody>
+                </table>
+              </div>
+              <div id="mg-ms-riwayat-paginasi"></div>
+            </div>
+          </div>
+
+          <!-- ===== TAB: CATAT BARANG MASUK ===== -->
+          <div id="mg-view-barangmasuk" style="display:none;">
+            <div class="web-panel" style="max-width:720px;">
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                <div style="font-size:13px; font-weight:700;">Catat Stock Masuk</div>
+                <div style="font-size:11.5px; color:var(--web-text-dim);">No. <span id="mg-csm-nomor-preview">(otomatis)</span></div>
+              </div>
+              <div style="font-size:11px; color:var(--web-text-dim); margin-bottom:8px;">Memo ini nanti diverifikasi & dieksekusi Back Office sebelum stock sistem beneran berubah.</div>
+              <div class="mg-input-row">
+                <input id="mg-csm-input-sku" class="web-form-input" placeholder="Scan barcode / ketik SKU / nama produk, lalu Enter..." style="margin:0;" oninput="mgCariProdukLive('barangmasuk')" onkeydown="if(event.key==='Enter'){event.preventDefault(); mgTambahItemDariInput('barangmasuk');}" />
+                <button class="mg-btn-kamera" onclick="mgBukaKamera('barangmasuk')" title="Scan pakai kamera">📷 Kamera</button>
+              </div>
+              <div id="mg-csm-saran" class="mg-saran-produk" style="display:none;"></div>
+
+              <div class="web-table-wrap" style="margin-top:12px; max-height:420px;">
+                <table class="web-table mg-cart-table">
+                  <thead><tr><th>SKU</th><th style="width:130px;">Qty Masuk</th><th>Catatan / No. Surat Jalan</th><th></th></tr></thead>
+                  <tbody id="mg-csm-cart-body"></tbody>
+                </table>
+              </div>
+              <div class="web-placeholder" id="mg-csm-cart-empty">Keranjang masih kosong - scan/ketik SKU di atas buat mulai.</div>
+
+              <button class="web-btn-primary" style="width:100%; margin-top:14px;" onclick="mgKonfirmasiBarangMasuk()">Kirim Memo Barang Masuk</button>
+              <div class="status-text" id="mg-csm-status" style="text-align:left; margin-top:6px;"></div>
+            </div>
+
+            <div class="web-panel" style="max-width:720px; margin-top:14px;">
+              <div class="web-panel-header" style="margin-bottom:8px;"><span>Riwayat Catat Barang Masuk</span></div>
+              <div class="web-table-wrap">
+                <table class="web-table">
+                  <thead><tr><th>No Memo</th><th>Tanggal</th><th>Status</th><th>Dicatat Oleh</th><th></th></tr></thead>
+                  <tbody id="mg-csm-riwayat-body"></tbody>
+                </table>
+              </div>
+              <div id="mg-csm-riwayat-paginasi"></div>
+            </div>
+          </div>
+
+          <!-- ===== TAB: LAPOR HILANG/RUSAK ===== -->
+          <div id="mg-view-hilangrusak" style="display:none;">
+            <div class="web-panel" style="max-width:720px;">
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                <div style="font-size:13px; font-weight:700;">Lapor Hilang / Rusak</div>
+                <div style="font-size:11.5px; color:var(--web-text-dim);">No. <span id="mg-lhr-nomor-preview">(otomatis)</span></div>
+              </div>
+              <div class="mg-input-row">
+                <input id="mg-lhr-input-sku" class="web-form-input" placeholder="Scan barcode / ketik SKU / nama produk, lalu Enter..." style="margin:0;" oninput="mgCariProdukLive('hilangrusak')" onkeydown="if(event.key==='Enter'){event.preventDefault(); mgTambahItemDariInput('hilangrusak');}" />
+                <button class="mg-btn-kamera" onclick="mgBukaKamera('hilangrusak')" title="Scan pakai kamera">📷 Kamera</button>
+              </div>
+              <div id="mg-lhr-saran" class="mg-saran-produk" style="display:none;"></div>
+
+              <div class="web-table-wrap" style="margin-top:12px; max-height:420px;">
+                <table class="web-table mg-cart-table">
+                  <thead><tr><th>SKU</th><th style="width:130px;">Qty</th><th>Keterangan</th><th>Foto Bukti</th><th></th></tr></thead>
+                  <tbody id="mg-lhr-cart-body"></tbody>
+                </table>
+              </div>
+              <div class="web-placeholder" id="mg-lhr-cart-empty">Keranjang masih kosong - scan/ketik SKU di atas buat mulai.</div>
+
+              <button class="web-btn-primary" style="width:100%; margin-top:14px;" onclick="mgKirimMemoHilangRusak()">Kirim Laporan</button>
+              <div class="status-text" id="mg-lhr-status" style="text-align:left; margin-top:6px;"></div>
+            </div>
+
+            <div class="web-panel" style="max-width:720px; margin-top:14px;">
+              <div class="web-panel-header" style="margin-bottom:8px;"><span>Riwayat Lapor Hilang/Rusak</span></div>
+              <div class="web-table-wrap">
+                <table class="web-table">
+                  <thead><tr><th>No Memo</th><th>Tanggal</th><th>Status</th><th>Dibuat Oleh</th></tr></thead>
+                  <tbody id="mg-lhr-riwayat-body"></tbody>
+                </table>
+              </div>
+              <div id="mg-lhr-riwayat-paginasi"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ===== Modal Kamera (dipakai bareng ketiga tab Memo Gudang) ===== -->
+        <div id="mg-modal-kamera" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.6); z-index:260; align-items:center; justify-content:center;">
+          <div class="web-panel" style="max-width:420px; width:90%;">
+            <div class="web-panel-header" style="display:flex; align-items:center; gap:10px;">
+              <button class="web-btn-secondary" style="padding:4px 10px; margin:0;" onclick="mgTutupKamera()">◄ Kembali</button>
+              <span id="mg-kamera-judul">Scan Barcode</span>
+            </div>
+            <video id="mg-kamera-video" style="width:100%; border-radius:10px; background:#000;" autoplay playsinline muted></video>
+            <div id="mg-kamera-error" style="color:var(--web-danger); font-size:12px; margin-top:8px;"></div>
+            <button class="web-btn-primary" id="mg-kamera-btn-foto" style="width:100%; margin-top:10px; display:none;" onclick="mgAmbilFoto()">📸 Ambil Foto</button>
+          </div>
         </div>
 
         <div id="persediaan-view-mintastock" style="display:none;">
@@ -11760,17 +11952,362 @@ async function prodSimpanResep() {
   } catch (err) { stopLoadingDots(statusEl); statusEl.textContent = '✗ Gagal terhubung'; statusEl.className = 'status-text err'; }
 }
 
+/* ============================================================================
+   MEMO GUDANG - 3 tab. Prioritas UX: minim klik, cart lokal (draft aman di
+   localStorage sebelum submit), input dual (ketik/scan-keyboard + kamera).
+   ============================================================================ */
+let mgTabAktif = 'mintastock';
+let mgCarts = { mintastock: [], barangmasuk: [], hilangrusak: [] };
+let mgStokRealtimeCache = {};
+let mgKameraTarget = null; // 'mintastock' | 'barangmasuk' | 'hilangrusak' | {foto: idx}
+let mgZxingReader = null;
+
+const MG_PREFIX = { mintastock: 'ms', barangmasuk: 'csm', hilangrusak: 'lhr' };
+
+function mgMuatDraftLokal() {
+  try {
+    const raw = localStorage.getItem('mg_draft_carts');
+    if (raw) mgCarts = Object.assign({ mintastock: [], barangmasuk: [], hilangrusak: [] }, JSON.parse(raw));
+  } catch (e) {}
+}
+function mgSimpanDraftLokal() {
+  try { localStorage.setItem('mg_draft_carts', JSON.stringify(mgCarts)); } catch (e) {}
+}
+mgMuatDraftLokal();
+
+function mgGantiTab(tab) {
+  mgTabAktif = tab;
+  ['mintastock', 'barangmasuk', 'hilangrusak'].forEach(t => {
+    el('mg-tab-' + t).classList.toggle('active', t === tab);
+    el('mg-view-' + t).style.display = t === tab ? 'block' : 'none';
+  });
+  mgRenderCart(tab);
+  if (tab === 'mintastock') mgFetchRiwayat('mintastock');
+  else if (tab === 'barangmasuk') mgFetchRiwayat('barangmasuk');
+  else if (tab === 'hilangrusak') mgFetchRiwayat('hilangrusak');
+}
+
+/* ===== Cari produk live (dropdown saran) + tambah via Enter ===== */
+async function mgCariProdukLive(tab) {
+  const p = MG_PREFIX[tab];
+  const inputEl = el('mg-' + p + '-input-sku');
+  const saranEl = el('mg-' + p + '-saran');
+  const kata = inputEl.value.toLowerCase().trim();
+  if (kata.length < 2) { saranEl.style.display = 'none'; return; }
+  if (katalogProdukCache.length === 0) await katalogFetchProduk();
+  const hasil = katalogProdukCache.filter(pr => pr.sku.toLowerCase().includes(kata) || pr.nama.toLowerCase().includes(kata)).slice(0, 8);
+  if (hasil.length === 0) { saranEl.innerHTML = '<div class="mg-saran-item" style="color:var(--web-text-dim);">Nggak ketemu produk cocok.</div>'; saranEl.style.display = 'block'; return; }
+  saranEl.innerHTML = hasil.map(pr => `<div class="mg-saran-item" onclick="mgPilihSaran('${tab}', '${pr.sku.replace(/'/g, "\\'")}')"><b>${escapeHtml(pr.sku)}</b>${escapeHtml(pr.nama)}</div>`).join('');
+  saranEl.style.display = 'block';
+}
+
+function mgPilihSaran(tab, sku) {
+  mgTambahItemKeCart(tab, sku);
+  const p = MG_PREFIX[tab];
+  el('mg-' + p + '-input-sku').value = '';
+  el('mg-' + p + '-saran').style.display = 'none';
+  el('mg-' + p + '-input-sku').focus();
+}
+
+// Dipanggil pas tekan Enter - biar cocok juga buat scanner fisik yang "ngetik cepat + Enter".
+// SENGAJA TIDAK ADA validasi SKU harus terdaftar di Master Produk - ini baru draft/memo,
+// belum ngaruh ke stock beneran, jadi staff bebas ketik SKU apa aja (termasuk yang belum
+// ada di Master) dan diverifikasi belakangan sama kantor.
+async function mgTambahItemDariInput(tab) {
+  const p = MG_PREFIX[tab];
+  const inputEl = el('mg-' + p + '-input-sku');
+  const skuInput = inputEl.value.trim();
+  if (!skuInput) return;
+  if (katalogProdukCache.length === 0) await katalogFetchProduk();
+
+  // Coba cocokkan ke Master Produk dulu (buat auto-isi nama) - TAPI kalau nggak
+  // ketemu, tetap lanjut pakai SKU yang diketik apa adanya, bukan ditolak.
+  let produk = katalogProdukCache.find(pr => pr.sku.toLowerCase() === skuInput.toLowerCase());
+  if (!produk) produk = katalogProdukCache.find(pr => pr.sku.toLowerCase().includes(skuInput.toLowerCase()) || pr.nama.toLowerCase().includes(skuInput.toLowerCase()));
+
+  mgTambahItemKeCart(tab, produk ? produk.sku : skuInput);
+  inputEl.value = '';
+  el('mg-' + p + '-saran').style.display = 'none';
+  inputEl.focus();
+}
+
+function mgTambahItemKeCart(tab, sku) {
+  const cart = mgCarts[tab];
+  const sudahAda = cart.find(it => it.sku === sku);
+  if (sudahAda) {
+    sudahAda.qty = (sudahAda.qty || 0) + 1; // udah ada di cart - tambahin qty-nya aja, bukan bikin baris baru
+  } else {
+    const produk = katalogProdukCache.find(pr => pr.sku === sku);
+    cart.push({ sku, nama: produk ? produk.nama : sku, qty: 1, catatan: '', fotoUrl: '' });
+    mgMintaStokRealtime([sku]);
+  }
+  mgSimpanDraftLokal();
+  mgRenderCart(tab);
+}
+
+function mgUbahQty(tab, idx, delta) {
+  const cart = mgCarts[tab];
+  const qtyBaru = (parseFloat(cart[idx].qty) || 0) + delta;
+  cart[idx].qty = qtyBaru < 0 ? 0 : qtyBaru;
+  mgSimpanDraftLokal();
+  mgRenderCart(tab);
+}
+function mgSetQtyLangsung(tab, idx, value) {
+  const cart = mgCarts[tab];
+  const qty = parseFloat(value) || 0;
+  cart[idx].qty = qty < 0 ? 0 : qty;
+  mgSimpanDraftLokal();
+}
+function mgUbahCatatan(tab, idx, value) {
+  mgCarts[tab][idx].catatan = value;
+  mgSimpanDraftLokal();
+}
+function mgHapusItem(tab, idx) {
+  mgCarts[tab].splice(idx, 1);
+  mgSimpanDraftLokal();
+  mgRenderCart(tab);
+}
+
+async function mgMintaStokRealtime(skuList) {
+  try {
+    const data = await postJson({ aksi: 'lihat_stok_banyak_sku', email: currentUserEmail() });
+    if (data.success) { mgStokRealtimeCache = data.peta; mgRenderCart('mintastock'); }
+  } catch (err) {}
+}
+
+function mgRenderCart(tab) {
+  const cart = mgCarts[tab];
+  const p = MG_PREFIX[tab];
+  el('mg-' + p + '-cart-empty').style.display = cart.length === 0 ? 'block' : 'none';
+  el('mg-' + p + '-nomor-preview').textContent = '(otomatis saat dikirim)';
+
+  if (tab === 'mintastock') {
+    el('mg-ms-cart-body').innerHTML = cart.map((it, idx) => {
+      const sisaStok = mgStokRealtimeCache[it.sku] ? mgStokRealtimeCache[it.sku].stockSaatIni : '-';
+      return `
+        <tr>
+          <td data-label="SKU"><b>${escapeHtml(it.sku)}</b><div style="font-size:10.5px; color:var(--web-text-dim);">${escapeHtml(it.nama)}</div></td>
+          <td data-label="Sisa Stok">${sisaStok}</td>
+          <td data-label="Qty Minta">
+            <div class="mg-qty-stepper">
+              <button class="mg-qty-btn" onclick="mgUbahQty('mintastock',${idx},-1)">-</button>
+              <input class="mg-qty-input" type="number" value="${it.qty}" onchange="mgSetQtyLangsung('mintastock',${idx},this.value)" />
+              <button class="mg-qty-btn" onclick="mgUbahQty('mintastock',${idx},1)">+</button>
+            </div>
+          </td>
+          <td data-label="Catatan"><input class="mg-catatan-input" value="${escapeHtml(it.catatan)}" placeholder="Opsional" onchange="mgUbahCatatan('mintastock',${idx},this.value)" /></td>
+          <td data-label=""><button class="mg-hapus-btn" onclick="mgHapusItem('mintastock',${idx})">✕ Hapus</button></td>
+        </tr>`;
+    }).join('');
+  } else if (tab === 'barangmasuk') {
+    el('mg-csm-cart-body').innerHTML = cart.map((it, idx) => `
+      <tr>
+        <td data-label="SKU"><b>${escapeHtml(it.sku)}</b><div style="font-size:10.5px; color:var(--web-text-dim);">${escapeHtml(it.nama)}</div></td>
+        <td data-label="Qty Masuk">
+          <div class="mg-qty-stepper">
+            <button class="mg-qty-btn" onclick="mgUbahQty('barangmasuk',${idx},-1)">-</button>
+            <input class="mg-qty-input" type="number" value="${it.qty}" onchange="mgSetQtyLangsung('barangmasuk',${idx},this.value)" />
+            <button class="mg-qty-btn" onclick="mgUbahQty('barangmasuk',${idx},1)">+</button>
+          </div>
+        </td>
+        <td data-label="Catatan"><input class="mg-catatan-input" value="${escapeHtml(it.catatan)}" placeholder="Opsional" onchange="mgUbahCatatan('barangmasuk',${idx},this.value)" /></td>
+        <td data-label=""><button class="mg-hapus-btn" onclick="mgHapusItem('barangmasuk',${idx})">✕ Hapus</button></td>
+      </tr>`).join('');
+  } else if (tab === 'hilangrusak') {
+    el('mg-lhr-cart-body').innerHTML = cart.map((it, idx) => `
+      <tr>
+        <td data-label="SKU"><b>${escapeHtml(it.sku)}</b><div style="font-size:10.5px; color:var(--web-text-dim);">${escapeHtml(it.nama)}</div></td>
+        <td data-label="Qty">
+          <div class="mg-qty-stepper">
+            <button class="mg-qty-btn" onclick="mgUbahQty('hilangrusak',${idx},-1)">-</button>
+            <input class="mg-qty-input" type="number" value="${it.qty}" onchange="mgSetQtyLangsung('hilangrusak',${idx},this.value)" />
+            <button class="mg-qty-btn" onclick="mgUbahQty('hilangrusak',${idx},1)">+</button>
+          </div>
+        </td>
+        <td data-label="Keterangan"><input class="mg-catatan-input" value="${escapeHtml(it.catatan)}" placeholder="Kenapa hilang/rusak?" onchange="mgUbahCatatan('hilangrusak',${idx},this.value)" /></td>
+        <td data-label="Foto Bukti">
+          ${it.fotoUrl ? `<img src="${it.fotoUrl}" style="width:36px; height:36px; object-fit:cover; border-radius:6px; cursor:pointer;" onclick="window.open('${it.fotoUrl}','_blank')" />`
+            : `<button class="web-chart-toggle-btn" style="font-size:10.5px; padding:4px 8px;" onclick="mgBukaKamera({foto:${idx}})">📷 Foto</button>`}
+        </td>
+        <td data-label=""><button class="mg-hapus-btn" onclick="mgHapusItem('hilangrusak',${idx})">✕ Hapus</button></td>
+      </tr>`).join('');
+  }
+}
+
+/* ===== Kamera (dipakai bareng: scan SKU di 3 tab, ATAU foto bukti Hilang/Rusak) ===== */
+function mgBukaKamera(target) {
+  mgKameraTarget = target;
+  const isFoto = typeof target === 'object';
+  el('mg-kamera-judul').textContent = isFoto ? 'Ambil Foto Bukti' : 'Scan Barcode Produk';
+  el('mg-kamera-btn-foto').style.display = isFoto ? 'block' : 'none';
+  el('mg-kamera-error').textContent = '';
+  el('mg-modal-kamera').style.display = 'flex';
+
+  if (!window.ZXing) { el('mg-kamera-error').textContent = 'Library kamera gagal dimuat. Cek internet.'; return; }
+  const videoEl = el('mg-kamera-video');
+  navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } }).then(stream => {
+    videoEl.srcObject = stream;
+    if (!isFoto) {
+      mgZxingReader = new ZXing.BrowserMultiFormatReader();
+      mgZxingReader.decodeFromVideoElement(videoEl, (result) => {
+        if (result) { mgTutupKamera(); mgTambahItemKeCart(mgTabAktif, result.getText()); }
+      });
+    }
+  }).catch(err => { el('mg-kamera-error').textContent = 'Tidak bisa akses kamera: ' + err.message; });
+}
+
+function mgAmbilFoto() {
+  const videoEl = el('mg-kamera-video');
+  const canvas = document.createElement('canvas');
+  canvas.width = videoEl.videoWidth; canvas.height = videoEl.videoHeight;
+  canvas.getContext('2d').drawImage(videoEl, 0, 0);
+  const base64 = canvas.toDataURL('image/jpeg', 0.85).split(',')[1];
+  const idxFoto = mgKameraTarget.foto;
+  mgTutupKamera();
+  mgUploadFotoHilangRusak(idxFoto, base64);
+}
+
+function mgTutupKamera() {
+  el('mg-modal-kamera').style.display = 'none';
+  const videoEl = el('mg-kamera-video');
+  if (videoEl.srcObject) { videoEl.srcObject.getTracks().forEach(t => t.stop()); videoEl.srcObject = null; }
+  if (mgZxingReader) { try { mgZxingReader.reset(); } catch (e) {} mgZxingReader = null; }
+}
+
+async function mgUploadFotoHilangRusak(idx, base64) {
+  const item = mgCarts.hilangrusak[idx];
+  item.fotoBase64Pending = base64; // disimpen dulu di cart, baru diupload beneran pas submit (biar 1 aksi = 1 kirim)
+  item.fotoUrl = 'data:image/jpeg;base64,' + base64; // preview instan di cart
+  mgSimpanDraftLokal();
+  mgRenderCart('hilangrusak');
+}
+
+/* ===== Riwayat per tab ===== */
+async function mgFetchRiwayat(tab) {
+  const aksiMap = { mintastock: 'lihat_daftar_memo_minta_stock', barangmasuk: 'lihat_daftar_memo_barang_masuk', hilangrusak: 'lihat_daftar_memo_hilang_rusak' };
+  const p = MG_PREFIX[tab];
+  try {
+    const data = await postJson({ aksi: aksiMap[tab], email: currentUserEmail() });
+    if (!data.success) return;
+    const daftar = data.daftar || [];
+    if (tab === 'mintastock') {
+      el('mg-ms-riwayat-body').innerHTML = daftar.map(m => `
+        <tr><td>${escapeHtml(m.noMemo)}</td><td style="font-size:11px; color:var(--web-text-dim);">${escapeHtml(m.tanggal)}</td>
+        <td><span class="web-status-pill ${m.status === 'Bisa PO Stock' ? 'dikirim' : 'aktif'}">${escapeHtml(m.status)}</span></td>
+        <td style="font-size:11px;">${escapeHtml(m.dibuatOleh)}</td>
+        <td>${m.status === 'Pending' && currentUser.isOwner ? `<button class="web-chart-toggle-btn" style="font-size:11px;" onclick="mgApproveMintaStock('${m.noMemo}')">✓ Konfirmasi</button>` : ''}</td></tr>
+      `).join('');
+    } else if (tab === 'barangmasuk') {
+      el('mg-csm-riwayat-body').innerHTML = daftar.map(m => `
+        <tr><td>${escapeHtml(m.noMemo)}</td><td style="font-size:11px; color:var(--web-text-dim);">${escapeHtml(m.tanggal)}</td>
+        <td><span class="web-status-pill ${m.status === 'Dieksekusi' ? 'dikirim' : 'aktif'}">${escapeHtml(m.status)}</span></td>
+        <td style="font-size:11px;">${escapeHtml(m.dicatatOleh)}</td>
+        <td>${m.status === 'Menunggu' && currentUser.isOwner ? `<button class="web-chart-toggle-btn" style="font-size:11px;" onclick="mgEksekusiBarangMasuk('${m.noMemo}')">✓ Eksekusi ke Stock</button>` : ''}</td></tr>
+      `).join('');
+    } else if (tab === 'hilangrusak') {
+      el('mg-lhr-riwayat-body').innerHTML = daftar.map(m => `
+        <tr><td>${escapeHtml(m.noMemo)}</td><td style="font-size:11px; color:var(--web-text-dim);">${escapeHtml(m.tanggal)}</td>
+        <td><span class="web-status-pill ${m.status === 'Disetujui' ? 'dikirim' : (m.status === 'Ditolak' ? 'batal' : 'aktif')}">${escapeHtml(m.status)}</span></td>
+        <td style="font-size:11px;">${escapeHtml(m.dibuatOleh)}${m.status === 'Menunggu' && currentUser.isOwner ? ` <button class="web-chart-toggle-btn" style="font-size:10.5px; padding:2px 8px;" onclick="mgApproveHilangRusak('${m.noMemo}')">✓ Setujui</button>` : ''}</td></tr>
+      `).join('');
+    }
+  } catch (err) {}
+}
+
+async function mgApproveMintaStock(noMemo) {
+  if (!confirm(`Konfirmasi memo "${noMemo}" jadi "Bisa PO Stock"?`)) return;
+  const data = await postJson({ aksi: 'approve_memo_minta_stock', noMemo, email: currentUserEmail() });
+  if (data.success) { playBeep(); mgFetchRiwayat('mintastock'); } else { alert('Gagal: ' + (data.error || '')); }
+}
+
+async function mgApproveHilangRusak(noMemo) {
+  if (!confirm(`Setujui memo "${noMemo}"? Stock bakal otomatis dikurangi sebagai penyesuaian.`)) return;
+  const data = await postJson({ aksi: 'approve_memo_hilang_rusak', noMemo, email: currentUserEmail() });
+  if (data.success) { playBeep(); mgFetchRiwayat('hilangrusak'); } else { alert('Gagal: ' + (data.error || '')); }
+}
+
+/* ===== Submit tiap tab ===== */
+async function mgKirimMemoMintaStock() {
+  const items = mgCarts.mintastock.filter(it => it.qty > 0);
+  if (items.length === 0) { el('mg-ms-status').textContent = '✗ Keranjang kosong atau semua qty 0.'; el('mg-ms-status').className = 'status-text err'; return; }
+  const statusEl = el('mg-ms-status');
+  setLoadingDots(statusEl, 'Mengirim');
+  const itemsKirim = items.map(it => ({ sku: it.sku, nama: it.nama, qtyMinta: it.qty, catatan: it.catatan, sisaStok: mgStokRealtimeCache[it.sku] ? mgStokRealtimeCache[it.sku].stockSaatIni : 0 }));
+  try {
+    const data = await postJson({ aksi: 'simpan_memo_minta_stock', items: itemsKirim, email: currentUserEmail() });
+    stopLoadingDots(statusEl);
+    if (data.success) {
+      playBeep();
+      statusEl.textContent = `✓ Memo ${data.noMemo} terkirim!`;
+      statusEl.className = 'status-text ok';
+      mgCarts.mintastock = []; mgSimpanDraftLokal(); mgRenderCart('mintastock'); mgFetchRiwayat('mintastock');
+    } else { statusEl.textContent = '✗ Gagal: ' + (data.error || ''); statusEl.className = 'status-text err'; }
+  } catch (err) { stopLoadingDots(statusEl); statusEl.textContent = '✗ Gagal terhubung: ' + err.message; statusEl.className = 'status-text err'; }
+}
+
+async function mgEksekusiBarangMasuk(noMemo) {
+  if (!confirm(`Eksekusi memo "${noMemo}" ke stock sistem? Stock bakal bertambah sesuai qty di memo ini.`)) return;
+  const data = await postJson({ aksi: 'eksekusi_memo_barang_masuk', noMemo, email: currentUserEmail() });
+  if (data.success) { playBeep(); mgFetchRiwayat('barangmasuk'); } else { alert('Gagal: ' + (data.error || '')); }
+}
+
+async function mgKonfirmasiBarangMasuk() {
+  const items = mgCarts.barangmasuk.filter(it => it.qty > 0);
+  if (items.length === 0) { el('mg-csm-status').textContent = '✗ Keranjang kosong atau semua qty 0.'; el('mg-csm-status').className = 'status-text err'; return; }
+  const statusEl = el('mg-csm-status');
+  setLoadingDots(statusEl, 'Mengirim');
+  const itemsKirim = items.map(it => ({ sku: it.sku, qtyMasuk: it.qty, catatan: it.catatan }));
+  try {
+    const data = await postJson({ aksi: 'simpan_memo_barang_masuk', items: itemsKirim, email: currentUserEmail() });
+    stopLoadingDots(statusEl);
+    if (data.success) {
+      playBeep();
+      statusEl.textContent = `✓ Memo ${data.noMemo} terkirim, menunggu dieksekusi Back Office.`;
+      statusEl.className = 'status-text ok';
+      mgCarts.barangmasuk = []; mgSimpanDraftLokal(); mgRenderCart('barangmasuk'); mgFetchRiwayat('barangmasuk');
+    } else { statusEl.textContent = '✗ Gagal: ' + (data.error || ''); statusEl.className = 'status-text err'; }
+  } catch (err) { stopLoadingDots(statusEl); statusEl.textContent = '✗ Gagal terhubung: ' + err.message; statusEl.className = 'status-text err'; }
+}
+
+async function mgKirimMemoHilangRusak() {
+  const items = mgCarts.hilangrusak.filter(it => it.qty > 0);
+  if (items.length === 0) { el('mg-lhr-status').textContent = '✗ Keranjang kosong atau semua qty 0.'; el('mg-lhr-status').className = 'status-text err'; return; }
+  const statusEl = el('mg-lhr-status');
+  setLoadingDots(statusEl, 'Mengirim');
+  const itemsKirim = items.map(it => ({ sku: it.sku, qty: it.qty, catatan: it.catatan }));
+  try {
+    const data = await postJson({ aksi: 'simpan_memo_hilang_rusak', items: itemsKirim, email: currentUserEmail() });
+    if (!data.success) { stopLoadingDots(statusEl); statusEl.textContent = '✗ Gagal: ' + (data.error || ''); statusEl.className = 'status-text err'; return; }
+
+    // Setelah header+detail kesimpen, baru upload foto yang udah dijepret (kalau ada) satu-satu
+    const detailData = await postJson({ aksi: 'lihat_detail_memo_hilang_rusak', noMemo: data.noMemo, email: currentUserEmail() });
+    if (detailData.success) {
+      for (let i = 0; i < items.length; i++) {
+        if (items[i].fotoBase64Pending) {
+          const baris = detailData.daftar[i];
+          if (baris) await postJson({ aksi: 'upload_foto_memo_hilang_rusak', row: baris.row, base64: items[i].fotoBase64Pending, mimeType: 'image/jpeg', email: currentUserEmail() });
+        }
+      }
+    }
+    stopLoadingDots(statusEl);
+    playBeep();
+    statusEl.textContent = `✓ Laporan ${data.noMemo} terkirim!`;
+    statusEl.className = 'status-text ok';
+    mgCarts.hilangrusak = []; mgSimpanDraftLokal(); mgRenderCart('hilangrusak'); mgFetchRiwayat('hilangrusak');
+  } catch (err) { stopLoadingDots(statusEl); statusEl.textContent = '✗ Gagal terhubung: ' + err.message; statusEl.className = 'status-text err'; }
+}
+
 function persediaanBukaSub(sub) {
   simpanLokasiTerakhir('persediaan', sub);
   gantiTabWebLangsung2('persediaan');
-  ['posisi', 'monitor', 'transaksi', 'laporan', 'mintastock'].forEach(s => { el('persediaan-view-' + s).style.display = s === sub ? 'block' : 'none'; });
+  ['posisi', 'monitor', 'transaksi', 'laporan', 'memogudang'].forEach(s => { el('persediaan-view-' + s).style.display = s === sub ? 'block' : 'none'; });
   document.querySelectorAll('.web-nav-sub[data-persub]').forEach(btn => btn.classList.toggle('active', btn.dataset.persub === sub));
 
   if (sub === 'posisi') perFetchPosisiStok();
   else if (sub === 'monitor') perMuatVirtualStock();
   else if (sub === 'transaksi') { perTransGantiTab('mutasi'); }
   else if (sub === 'laporan') perFetchLaporanInventoryDetail();
-  else if (sub === 'mintastock') { mintaStockGantiTab('cart'); }
+  else if (sub === 'memogudang') { mgGantiTab('mintastock'); }
 }
 
 function gantiTabWebLangsung2(tab) {
