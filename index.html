@@ -5273,8 +5273,14 @@ function toggleNavGroup(btnEl) {
 // grup yang "nempel" kebuka via klik TETAP kelihatan walau kamu udah hover ke grup lain -
 // nyebabin beberapa dropdown numpuk bersamaan. Listener ini nutup paksa grup lain (hapus
 // class-nya) begitu kursor masuk ke grup manapun, jadi cuma 1 dropdown yang bisa kelihatan.
+// Listener ini KHUSUS buat mode "Header Atas" (web-menu-top) - di mode itu submenu emang
+// tampil lewat hover ATAU klik (independen di CSS), jadi perlu dipaksa nutup manual pas
+// pindah hover. Di mode SIDEBAR biasa, ini SENGAJA TIDAK BOLEH jalan - sidebar cuma nutup
+// kalau ada KLIK di menu lain, hover doang nggak boleh ganggu status yang udah kebuka.
 document.querySelectorAll('.web-nav-group').forEach(group => {
   group.addEventListener('mouseenter', () => {
+    const shell = document.querySelector('.web-shell');
+    if (!shell || !shell.classList.contains('web-menu-top')) return; // lagi di mode sidebar - jangan lakukan apa-apa
     document.querySelectorAll('.web-nav-group.web-nav-group-open').forEach(g => {
       if (g !== group) g.classList.remove('web-nav-group-open');
     });
