@@ -4236,11 +4236,67 @@ const LOGO_OMI_B64 = "/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAMCAgMCAgMDAwMEAwMEBQgFBQ
             <button class="web-btn-primary" onclick="katalogBukaModalTambahProduk()" style="font-size:12px;">+ Tambah Produk Baru</button>
           </div>
 
+          <div class="web-toolbar-row" style="margin-top:8px;">
+            <input type="text" id="katalog-produk-cari" class="web-search-input" placeholder="🔍 Cari Nama Produk / SKU..." style="max-width:240px; margin:0;" oninput="katalogProdukPaginasiState.page=1; katalogProdukRenderHalaman();" />
+            <select id="katalog-produk-filter-kategori" class="web-form-input" style="max-width:170px; margin-bottom:0;" onchange="katalogProdukPaginasiState.page=1; katalogProdukRenderHalaman();">
+              <option value="">Semua Kategori</option>
+            </select>
+            <select id="katalog-produk-filter-channel" class="web-form-input" style="max-width:170px; margin-bottom:0;" onchange="katalogProdukPaginasiState.page=1; katalogProdukRenderHalaman();">
+              <option value="">Semua Channel</option>
+              <option value="__belum_tampil__">Belum Tampil</option>
+              <option value="TikTok Shop">TikTok Shop</option>
+              <option value="Shopee">Shopee</option>
+              <option value="Tokopedia">Tokopedia</option>
+            </select>
+            <select id="katalog-produk-sort" class="web-form-input" style="max-width:170px; margin-bottom:0;" onchange="katalogProdukRenderHalaman();">
+              <option value="nama-asc">Nama A-Z</option>
+              <option value="nama-desc">Nama Z-A</option>
+              <option value="terbaru">Produk Terbaru</option>
+            </select>
+          </div>
+
+          <!-- Floating batch action bar - cuma nongol kalau ada yang dicentang -->
+          <div id="katalog-batch-bar" style="display:none; position:sticky; top:0; z-index:15; background:var(--web-info); color:#fff; border-radius:10px; padding:10px 16px; margin:10px 0; display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
+            <span id="katalog-batch-count" style="font-weight:700; font-size:12.5px;">0 dipilih</span>
+            <div style="flex:1;"></div>
+            <button class="web-btn-secondary" style="margin:0; background:#fff;" onclick="katalogBatchBukaModalKategori()">📁 Ubah Kategori</button>
+            <button class="web-btn-secondary" style="margin:0; background:#fff;" onclick="katalogBatchBukaModalChannel()">🌐 Ubah Status Website</button>
+            <button class="web-btn-danger" style="margin:0;" onclick="katalogBatchHapusProduk()">🗑️ Hapus Terpilih</button>
+            <button class="web-btn-secondary" style="margin:0; background:#fff;" onclick="katalogBatchBatalkanSemua()">Batalkan</button>
+          </div>
+
+          <!-- Modal Ubah Kategori Massal -->
+          <div id="katalog-modal-batch-kategori" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.45); z-index:250; align-items:center; justify-content:center;">
+            <div class="web-panel" style="max-width:380px; width:100%;">
+              <div class="web-panel-header"><span>Ubah Kategori Massal</span></div>
+              <div style="font-size:12px; color:var(--web-text-dim); margin-bottom:10px;"><span id="katalog-batch-kategori-jumlah"></span> produk terpilih akan diubah kategorinya.</div>
+              <select id="katalog-batch-kategori-pilihan" class="web-form-input"></select>
+              <button class="web-btn-primary" style="width:100%;" onclick="katalogBatchSimpanKategori()">Simpan</button>
+              <button class="web-btn-secondary" style="width:100%; margin-top:6px;" onclick="el('katalog-modal-batch-kategori').style.display='none'">Batal</button>
+              <div class="status-text" id="katalog-batch-kategori-status" style="text-align:left; margin-top:6px;"></div>
+            </div>
+          </div>
+
+          <!-- Modal Ubah Status Website Massal -->
+          <div id="katalog-modal-batch-channel" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.45); z-index:250; align-items:center; justify-content:center;">
+            <div class="web-panel" style="max-width:380px; width:100%;">
+              <div class="web-panel-header"><span>Ubah Status Tampil di Website</span></div>
+              <div style="font-size:12px; color:var(--web-text-dim); margin-bottom:10px;"><span id="katalog-batch-channel-jumlah"></span> produk terpilih.</div>
+              <select id="katalog-batch-channel-pilihan" class="web-form-input">
+                <option value="true">Tampilkan di Website</option>
+                <option value="false">Sembunyikan dari Website</option>
+              </select>
+              <button class="web-btn-primary" style="width:100%;" onclick="katalogBatchSimpanChannel()">Simpan</button>
+              <button class="web-btn-secondary" style="width:100%; margin-top:6px;" onclick="el('katalog-modal-batch-channel').style.display='none'">Batal</button>
+              <div class="status-text" id="katalog-batch-channel-status" style="text-align:left; margin-top:6px;"></div>
+            </div>
+          </div>
+
           <!-- TAMPILAN TABLE -->
           <div id="katalog-produk-tampilan-table">
             <div class="web-table-wrap">
               <table class="web-table">
-                <thead><tr><th>Foto</th><th>SKU</th><th>Nama Produk</th><th>Merk</th><th>Kategori</th><th>URL Supplier</th><th>Channel</th></tr></thead>
+                <thead><tr><th style="width:28px;"><input type="checkbox" id="katalog-produk-checkall" onchange="katalogToggleSelectSemua(this.checked)" /></th><th>Foto</th><th>SKU</th><th>Nama Produk</th><th>Merk</th><th>Kategori</th><th>URL Supplier</th><th>Channel</th></tr></thead>
                 <tbody id="katalog-produk-body"></tbody>
               </table>
             </div>
@@ -9381,14 +9437,35 @@ function gantiTabWebLangsung(tab) {
 let katalogProdukCache = [];
 let katalogProdukTampilanAktif = 'table';
 let katalogProdukPaginasiState = buatStatePaginasi();
+let katalogProdukTerpilih = new Set();
 
 let katalogSkuTerhubungMap = {}; // skuJual -> [daftar SKU yang terhubung ke situ]
+
+function katalogFilterSortProduk() {
+  const cari = (el('katalog-produk-cari')?.value || '').toLowerCase().trim();
+  const filterKategori = el('katalog-produk-filter-kategori')?.value || '';
+  const filterChannel = el('katalog-produk-filter-channel')?.value || '';
+  const sortBy = el('katalog-produk-sort')?.value || 'nama-asc';
+
+  let daftar = katalogProdukCache;
+  if (cari) daftar = daftar.filter(p => p.nama.toLowerCase().includes(cari) || p.sku.toLowerCase().includes(cari));
+  if (filterKategori) daftar = daftar.filter(p => p.kategori === filterKategori);
+  if (filterChannel === '__belum_tampil__') daftar = daftar.filter(p => !p.channel || p.channel.length === 0);
+  else if (filterChannel) daftar = daftar.filter(p => p.channel && p.channel.includes(filterChannel));
+
+  daftar = [...daftar]; // biar sort nggak ngubah urutan asli cache
+  if (sortBy === 'nama-asc') daftar.sort((a, b) => a.nama.localeCompare(b.nama));
+  else if (sortBy === 'nama-desc') daftar.sort((a, b) => b.nama.localeCompare(a.nama));
+  else if (sortBy === 'terbaru') daftar.reverse(); // cache-nya sesuai urutan sheet (lama->baru), reverse = terbaru duluan
+
+  return daftar;
+}
 
 async function katalogFetchProduk() {
   if (katalogProdukCache.length === 0) {
     const dataLokal = ambilCacheLokal('katalog_produk');
     if (dataLokal) { katalogProdukCache = dataLokal.daftar || []; katalogSkuTerhubungMap = dataLokal.skuTerhubungMap || {}; katalogProdukRenderHalaman(); }
-    else tampilkanMemuatTabel('katalog-produk-body', 7);
+    else tampilkanMemuatTabel('katalog-produk-body', 8);
   }
   try {
     const [dataProduk, dataLink] = await Promise.all([
@@ -9408,7 +9485,8 @@ async function katalogFetchProduk() {
     }
 
     katalogProdukRenderHalaman();
-    katalogMuatDaftarKategori();
+    await katalogMuatDaftarKategori();
+    katalogIsiDropdownFilterKategori();
     simpanCacheLokal('katalog_produk', { daftar: katalogProdukCache, skuTerhubungMap: katalogSkuTerhubungMap });
   } catch (err) {
     if (katalogProdukCache.length === 0) el('katalog-produk-body').innerHTML = `<tr><td colspan="6" style="text-align:center; color:var(--web-danger);">Gagal terhubung: ${escapeHtml(err.message)}</td></tr>`;
@@ -9416,13 +9494,23 @@ async function katalogFetchProduk() {
 }
 
 function katalogProdukRenderHalaman() {
-  el('katalog-produk-empty').style.display = katalogProdukCache.length === 0 ? 'block' : 'none';
-  const halamanIni = halamanDataPaginasi(katalogProdukCache, katalogProdukPaginasiState);
+  const daftarTerfilter = katalogFilterSortProduk();
+  el('katalog-produk-empty').style.display = daftarTerfilter.length === 0 ? 'block' : 'none';
+  const halamanIni = halamanDataPaginasi(daftarTerfilter, katalogProdukPaginasiState);
 
   if (katalogProdukTampilanAktif === 'table') katalogRenderTabel(halamanIni);
   else katalogRenderCard(halamanIni);
 
-  renderPaginasi('katalog-produk-paginasi', katalogProdukCache.length, katalogProdukPaginasiState, katalogProdukRenderHalaman);
+  katalogUpdateBatchBar();
+  renderPaginasi('katalog-produk-paginasi', daftarTerfilter.length, katalogProdukPaginasiState, katalogProdukRenderHalaman);
+}
+
+function katalogIsiDropdownFilterKategori() {
+  const selectEl = el('katalog-produk-filter-kategori');
+  if (!selectEl) return;
+  const nilaiSaatIni = selectEl.value;
+  selectEl.innerHTML = '<option value="">Semua Kategori</option>' + katalogDaftarKategoriCache.map(k => `<option value="${escapeHtml(k)}">${escapeHtml(k)}</option>`).join('');
+  selectEl.value = nilaiSaatIni; // pertahankan pilihan kalau masih ada di daftar baru
 }
 
 // Versi ringkas buat tampilan Card - cuma ikon kecil tanpa teks "Belum tampil" (biar card tetap
@@ -9458,6 +9546,7 @@ function katalogRenderTabel(halamanIni) {
 
   el('katalog-produk-body').innerHTML = halamanIni.map((p) => `
     <tr>
+      <td><input type="checkbox" class="katalog-produk-checkbox" data-sku="${escapeHtml(p.sku)}" ${katalogProdukTerpilih.has(p.sku) ? 'checked' : ''} onchange="katalogToggleSelectSatu('${p.sku.replace(/'/g, "\\'")}', this.checked)" /></td>
       <td>
         <div style="display:flex; align-items:center; gap:3px;" class="katalog-foto-hover-wrap">
           <div class="katalog-foto-wrap" data-sku="${escapeHtml(p.sku)}" style="width:44px; height:44px; border-radius:8px; overflow:hidden; border:1px solid var(--web-border); display:flex; align-items:center; justify-content:center; background:var(--web-bg); flex:none;">
@@ -9507,6 +9596,99 @@ function katalogRenderTabel(halamanIni) {
   `).join('');
 
   katalogPasangHandlerBaris();
+}
+
+/* ===== Selection & Aksi Massal ===== */
+function katalogToggleSelectSatu(sku, checked) {
+  if (checked) katalogProdukTerpilih.add(sku);
+  else katalogProdukTerpilih.delete(sku);
+  katalogUpdateBatchBar();
+}
+
+function katalogToggleSelectSemua(checked) {
+  // Cuma pilih/batalkan yang KELIHATAN di halaman ini - biar nggak diam-diam nyentuh SKU di halaman lain
+  document.querySelectorAll('.katalog-produk-checkbox').forEach(cb => {
+    cb.checked = checked;
+    if (checked) katalogProdukTerpilih.add(cb.dataset.sku);
+    else katalogProdukTerpilih.delete(cb.dataset.sku);
+  });
+  katalogUpdateBatchBar();
+}
+
+function katalogUpdateBatchBar() {
+  const jumlah = katalogProdukTerpilih.size;
+  el('katalog-batch-bar').style.display = jumlah > 0 ? 'flex' : 'none';
+  if (jumlah > 0) el('katalog-batch-count').textContent = `${jumlah} dipilih`;
+  const checkAllEl = el('katalog-produk-checkall');
+  if (checkAllEl) {
+    const semuaCheckbox = document.querySelectorAll('.katalog-produk-checkbox');
+    checkAllEl.checked = semuaCheckbox.length > 0 && Array.from(semuaCheckbox).every(cb => cb.checked);
+  }
+}
+
+function katalogBatchBatalkanSemua() {
+  katalogProdukTerpilih.clear();
+  document.querySelectorAll('.katalog-produk-checkbox').forEach(cb => cb.checked = false);
+  katalogUpdateBatchBar();
+}
+
+function katalogBatchBukaModalKategori() {
+  el('katalog-batch-kategori-jumlah').textContent = katalogProdukTerpilih.size;
+  el('katalog-batch-kategori-pilihan').innerHTML = katalogDaftarKategoriCache.map(k => `<option value="${escapeHtml(k)}">${escapeHtml(k)}</option>`).join('');
+  el('katalog-batch-kategori-status').textContent = '';
+  el('katalog-modal-batch-kategori').style.display = 'flex';
+}
+
+async function katalogBatchSimpanKategori() {
+  const kategoriBaru = el('katalog-batch-kategori-pilihan').value;
+  const statusEl = el('katalog-batch-kategori-status');
+  setLoadingDots(statusEl, 'Menyimpan');
+  try {
+    const data = await postJson({ aksi: 'ubah_kategori_massal', skuList: Array.from(katalogProdukTerpilih), kategoriBaru, toko: currentToko, email: currentUserEmail() });
+    stopLoadingDots(statusEl);
+    if (data.success) {
+      playBeep();
+      statusEl.textContent = `✓ ${data.jumlahBerhasil} produk diperbarui`;
+      statusEl.className = 'status-text ok';
+      setTimeout(() => { el('katalog-modal-batch-kategori').style.display = 'none'; katalogBatchBatalkanSemua(); katalogFetchProduk(); }, 700);
+    } else { statusEl.textContent = '✗ Gagal: ' + (data.error || ''); statusEl.className = 'status-text err'; }
+  } catch (err) { stopLoadingDots(statusEl); statusEl.textContent = '✗ Gagal terhubung: ' + err.message; statusEl.className = 'status-text err'; }
+}
+
+function katalogBatchBukaModalChannel() {
+  el('katalog-batch-channel-jumlah').textContent = katalogProdukTerpilih.size;
+  el('katalog-batch-channel-status').textContent = '';
+  el('katalog-modal-batch-channel').style.display = 'flex';
+}
+
+async function katalogBatchSimpanChannel() {
+  const tampilWebsite = el('katalog-batch-channel-pilihan').value === 'true';
+  const statusEl = el('katalog-batch-channel-status');
+  setLoadingDots(statusEl, 'Menyimpan');
+  try {
+    const data = await postJson({ aksi: 'ubah_tampil_website_massal', skuList: Array.from(katalogProdukTerpilih), tampilWebsite, toko: currentToko, email: currentUserEmail() });
+    stopLoadingDots(statusEl);
+    if (data.success) {
+      playBeep();
+      statusEl.textContent = `✓ ${data.jumlahBerhasil} produk diperbarui`;
+      statusEl.className = 'status-text ok';
+      setTimeout(() => { el('katalog-modal-batch-channel').style.display = 'none'; katalogBatchBatalkanSemua(); katalogFetchProduk(); }, 700);
+    } else { statusEl.textContent = '✗ Gagal: ' + (data.error || ''); statusEl.className = 'status-text err'; }
+  } catch (err) { stopLoadingDots(statusEl); statusEl.textContent = '✗ Gagal terhubung: ' + err.message; statusEl.className = 'status-text err'; }
+}
+
+async function katalogBatchHapusProduk() {
+  const jumlah = katalogProdukTerpilih.size;
+  if (!confirm(`Hapus ${jumlah} produk terpilih secara PERMANEN dari Master Produk?\n\nRiwayat transaksi/stock lama TETAP tersimpan (SKU-nya cuma teks, bukan link), tapi produk ini nggak akan muncul lagi di Katalog. Tindakan ini TIDAK BISA dibatalkan.`)) return;
+  try {
+    const data = await postJson({ aksi: 'hapus_produk_massal', skuList: Array.from(katalogProdukTerpilih), toko: currentToko, email: currentUserEmail() });
+    if (data.success) {
+      playBeep();
+      alert(`${data.jumlahBerhasil} produk berhasil dihapus.`);
+      katalogBatchBatalkanSemua();
+      katalogFetchProduk();
+    } else { alert('Gagal: ' + (data.error || '')); }
+  } catch (err) { alert('Gagal terhubung: ' + err.message); }
 }
 
 function katalogRenderCard(halamanIni) {
