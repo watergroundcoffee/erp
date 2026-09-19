@@ -949,7 +949,7 @@ const LOGO_OMI_B64 = "/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAMCAgMCAgMDAwMEAwMEBQgFBQ
     margin-top: 8px; width: 100%; font-size: 11.5px; padding: 6px; border-radius: 6px;
     border: 1px solid currentColor; background: none; color: inherit; cursor: pointer; font-family: inherit; opacity: 0.85;
   }
-  .web-placeholder { color: var(--web-text-dim); font-size: 13px; text-align: center; padding: 60px 20px; }
+  .web-placeholder { color: var(--web-text-dim, var(--text-dim, #888)); font-size: 13px; text-align: center; padding: 60px 20px; }
 
   /* ===== Layar Login Web (split kiri-kanan, gaya Jubelio + tombol gaya Mekari) ===== */
   #screen-login-web {
@@ -1063,9 +1063,9 @@ const LOGO_OMI_B64 = "/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAMCAgMCAgMDAwMEAwMEBQgFBQ
     margin-top: 6px; border: 1px solid var(--web-border); border-radius: 10px; overflow: hidden;
     max-height: 220px; overflow-y: auto; background: var(--web-panel);
   }
-  .mg-saran-item { padding: 10px 14px; cursor: pointer; font-size: 12.5px; border-bottom: 1px solid var(--web-border); }
+  .mg-saran-item { padding: 10px 14px; cursor: pointer; font-size: 12.5px; border-bottom: 1px solid var(--web-border, var(--panel-border, #333)); }
   .mg-saran-item:last-child { border-bottom: none; }
-  .mg-saran-item:hover { background: var(--web-bg); }
+  .mg-saran-item:hover { background: var(--web-bg, var(--bg, #222)); }
   .mg-saran-item b { display: block; font-size: 13px; }
   .mg-qty-stepper { display: flex; align-items: center; gap: 8px; flex-wrap: nowrap; }
   .mg-qty-controls { display: flex; align-items: center; gap: 6px; flex: none; }
@@ -1081,7 +1081,7 @@ const LOGO_OMI_B64 = "/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAMCAgMCAgMDAwMEAwMEBQgFBQ
   }
   .mg-qty-target { font-size: 12px; color: var(--web-text-dim); font-weight: 700; white-space: nowrap; flex: none; }
   .mg-catatan-input { width: 100%; border: 1px solid var(--web-border); border-radius: 6px; padding: 6px 8px; font-size: 12px; }
-  .mg-hapus-btn { background: none; border: none; color: var(--web-danger); cursor: pointer; font-size: 15px; }
+  .mg-hapus-btn { background: none; border: none; color: var(--web-danger, #d9534f); cursor: pointer; font-size: 15px; }
 
   /* ===== Ghost style - item dari Checklist yang belum dicocokkan qty fisiknya ===== */
   .mg-cart-table tr.mg-ghost { opacity: 0.45; }
@@ -1094,7 +1094,7 @@ const LOGO_OMI_B64 = "/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAMCAgMCAgMDAwMEAwMEBQgFBQ
     #mg-ms-input-sku, #mg-csm-input-sku, #mg-lhr-input-sku { min-height: 46px; font-size: 15px; flex: 1 1 160px; }
     .mg-qty-btn { width: 40px; height: 40px; font-size: 19px; border-radius: 10px; }
     .mg-qty-input { width: 52px; font-size: 15px; padding: 8px 2px; }
-    .mg-hapus-btn { font-size: 13px; padding: 8px 10px; min-height: 40px; border: 1px solid var(--web-border); border-radius: 8px; }
+    .mg-hapus-btn { font-size: 13px; padding: 8px 10px; min-height: 40px; border: 1px solid var(--web-border, var(--panel-border, #333)); border-radius: 8px; }
 
     .mg-cart-table thead { display: none; }
     .mg-cart-table, .mg-cart-table tbody, .mg-cart-table tr, .mg-cart-table td { display: block; width: 100%; }
@@ -1249,17 +1249,13 @@ const LOGO_OMI_B64 = "/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAMCAgMCAgMDAwMEAwMEBQgFBQ
         <span class="label">SCAN RESI MASUK</span>
         <span class="count" id="count-masuk-gabungan">-</span>
       </button>
-      <button class="menu-btn stockreq" onclick="openStockOpname()">
-        <span class="icon">➡️📦</span>
-        <span class="label">MINTA STOCK</span>
+      <button class="menu-btn stockreq" onclick="bukaMemoGudangMobile()">
+        <span class="icon">📋</span>
+        <span class="label">CATAT MEMO GUDANG</span>
       </button>
       <button class="menu-btn invoice" onclick="openPesananManual()">
         <span class="icon">🧾</span>
         <span class="label">PROSES PESANAN MANUAL</span>
-      </button>
-      <button class="menu-btn ledgerstock" onclick="openLedgerStock()">
-        <span class="icon">📊</span>
-        <span class="label">STOCK OPNAME & MASUK</span>
       </button>
       <button class="menu-btn invoicesupplier" onclick="openInvoiceSupplier()">
         <span class="icon">📄</span>
@@ -1756,6 +1752,73 @@ const LOGO_OMI_B64 = "/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAMCAgMCAgMDAwMEAwMEBQgFBQ
     </div>
 
     <!-- LAYAR LIHAT STOCK LEDGER -->
+    <!-- ===== CATAT MEMO GUDANG (mobile) - gabungan Minta Stock + Catat Barang Masuk + Lapor Hilang/Rusak ===== -->
+    <div id="screen-memo-gudang" style="display:none; flex-direction:column; align-items:center; gap:10px; width:100%;">
+      <button class="back-btn" onclick="hideAllScreens(); el('screen-menu').style.display='flex';">← Kembali ke Menu</button>
+      <div class="title">Catat Memo Gudang</div>
+
+      <div class="input-toggle" style="width:100%;">
+        <button class="toggle-btn active" id="mgm-tab-mintastock" onclick="mgmGantiTab('mintastock')" style="flex:1; font-size:12px;">Minta Stock</button>
+        <button class="toggle-btn" id="mgm-tab-barangmasuk" onclick="mgmGantiTab('barangmasuk')" style="flex:1; font-size:12px;">Barang Masuk</button>
+        <button class="toggle-btn" id="mgm-tab-hilangrusak" onclick="mgmGantiTab('hilangrusak')" style="flex:1; font-size:12px;">Hilang/Rusak</button>
+      </div>
+
+      <div class="toolbar-row" style="width:100%;">
+        <div class="input-toggle">
+          <button class="toggle-btn active" id="mgm-toggle-manual" onclick="mgmSetInputMode('manual')">⌨️ Ketik/Scanner</button>
+          <button class="toggle-btn" id="mgm-toggle-camera" onclick="mgmSetInputMode('camera')">📷 Kamera</button>
+        </div>
+        <button class="lihat-btn" onclick="mgmBukaRiwayat()">📜 Riwayat</button>
+      </div>
+
+      <div class="text-input-wrap" id="mgm-input-wrap" style="width:100%;">
+        <div class="hint-text">Scan barcode / ketik SKU / nama produk, lalu Enter</div>
+        <input id="mgm-sku-input" type="text" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Kode SKU / nama produk" oninput="mgmCariProdukLive()" onkeydown="if(event.key==='Enter'){event.preventDefault(); mgmTambahItemDariInput();}" />
+      </div>
+      <div class="cam-wrap" id="mgm-camera-wrap" style="display:none; width:100%;">
+        <div class="cam-frame">
+          <video id="mgm-camera-video" playsinline autoplay muted></video>
+          <div class="cam-guideline"></div>
+          <div class="cam-caption">Posisikan barcode di tengah</div>
+        </div>
+        <div class="cam-error" id="mgm-camera-error"></div>
+      </div>
+      <div id="mgm-saran" style="display:none; width:100%; border:1px solid var(--panel-border); border-radius:10px; overflow:hidden; max-height:200px; overflow-y:auto;"></div>
+
+      <div class="web-placeholder" id="mgm-cart-empty" style="width:100%; box-sizing:border-box;">
+        Keranjang masih kosong - scan/ketik SKU di atas buat mulai.
+        <div id="mgm-btn-checklist-wrap" style="display:none; margin-top:12px;">
+          <button class="back-btn" onclick="mgmBukaChecklist()">📋 Gunakan Checklist</button>
+        </div>
+      </div>
+
+      <div id="mgm-progres" style="display:none; width:100%; box-sizing:border-box; background:rgba(59,130,246,0.1); border:1px solid #3b82f6; border-radius:8px; padding:8px 14px; font-size:12.5px; font-weight:700; text-align:center;"></div>
+
+      <div id="mgm-cart-list" style="width:100%; display:flex; flex-direction:column; gap:8px;"></div>
+
+      <button class="back-btn" id="mgm-btn-submit" style="width:100%; background:#2f9e6e; color:#fff; border-color:#2f9e6e; margin-top:6px;" onclick="mgmSubmit()">Kirim Memo</button>
+      <div class="status-text" id="mgm-status"></div>
+    </div>
+
+    <!-- ===== Riwayat Memo Gudang (mobile) ===== -->
+    <div id="screen-memo-gudang-riwayat" style="display:none; flex-direction:column; align-items:center; gap:10px; width:100%;">
+      <button class="back-btn" onclick="hideAllScreens(); el('screen-memo-gudang').style.display='flex';">← Kembali</button>
+      <div class="title" id="mgm-riwayat-judul">Riwayat</div>
+      <div id="mgm-riwayat-list" style="width:100%; display:flex; flex-direction:column; gap:8px;"></div>
+      <div class="web-placeholder" id="mgm-riwayat-empty" style="display:none; width:100%; box-sizing:border-box;">Belum ada riwayat.</div>
+    </div>
+
+    <!-- ===== Pilih Invoice buat Checklist (mobile, khusus tab Barang Masuk) ===== -->
+    <div id="screen-memo-gudang-checklist" style="display:none; flex-direction:column; align-items:center; gap:10px; width:100%;">
+      <button class="back-btn" onclick="hideAllScreens(); el('screen-memo-gudang').style.display='flex';">← Kembali</button>
+      <div class="title">Pilih Invoice buat Checklist</div>
+      <div class="text-input-wrap" style="width:100%;">
+        <input id="mgm-checklist-cari" type="text" placeholder="🔍 Cari No Invoice / Supplier..." oninput="mgmRenderDaftarChecklist()" />
+      </div>
+      <div id="mgm-checklist-list" style="width:100%; display:flex; flex-direction:column; gap:8px;"></div>
+      <div class="web-placeholder" id="mgm-checklist-empty" style="display:none; width:100%; box-sizing:border-box;">Nggak ada invoice yang masih "Belum Dicek".</div>
+    </div>
+
     <div id="screen-lihat-stock" style="display:none; flex-direction:column; align-items:center; gap:10px; width:100%;">
       <div class="mode-badge" style="background:#3fa6a0; color:#05201d;">STOCK SAAT INI</div>
       <div class="text-input-wrap" style="padding:10px 14px;">
@@ -5023,6 +5086,8 @@ function terapkanTampilanLogin() {
   // Layar lebar (laptop/desktop) -> otomatis masuk ke tampilan web dashboard, bukan menu mobile
   if (window.innerWidth >= 1024 && !paksaModeMobile) {
     switchKeTampilanWeb();
+  } else {
+    terapkanKunciTemaMobile();
   }
 }
 
@@ -5144,6 +5209,7 @@ function bukaMobileDariWeb() {
   paksaModeMobile = true;
   el('app-web').style.display = 'none';
   el('app').style.display = 'block';
+  terapkanKunciTemaMobile();
   perbaruiIkonTema();
   el('screen-menu').style.display = 'flex';
 }
@@ -14142,7 +14208,8 @@ function hideAllScreens() {
    'screen-invoice','screen-invoice-cart','screen-invoice-preview','screen-pesanan-list',
    'screen-pesanan-detail','screen-pesanan-kirim','screen-tanda-terima','screen-ledger-stock','screen-lihat-stock','screen-ledger-jenis','screen-tes-bluetooth',
    'screen-invoice-supplier','screen-review-invoice-supplier','screen-daftar-invoice-supplier',
-   'screen-stock-masuk-tanggal','screen-rekonsiliasi-mutasi','screen-riwayat-minta-stock']
+   'screen-stock-masuk-tanggal','screen-rekonsiliasi-mutasi','screen-riwayat-minta-stock',
+   'screen-memo-gudang','screen-memo-gudang-riwayat','screen-memo-gudang-checklist']
     .forEach(id => { el(id).style.display = 'none'; });
   // Sembunyiin lagi konten print mobile - biar cuma keliatan pas di screen-invoice-preview aja
   el('print-invoice-pages').style.display = 'none';
@@ -14809,6 +14876,15 @@ async function fetchRekonsiliasiMutasi() {
 }
 
 /* ================= TEMA TERANG/GELAP ================= */
+// Mobile SELALU dark mode, nggak bisa diubah user - toggle-nya disembunyikan juga.
+// Web tetap ngikutin preferensi tersimpan (localStorage) seperti biasa.
+function terapkanKunciTemaMobile() {
+  document.body.classList.add('tema-gelap');
+  document.body.classList.remove('tema-terang');
+  const btnToggle = el('btn-tema-mobile');
+  if (btnToggle) btnToggle.style.display = 'none';
+}
+
 function terapkanTemaAwal() {
   const disimpan = localStorage.getItem('trg_tema'); // 'terang' | 'gelap' | null (belum pernah pilih manual)
   if (disimpan === 'terang') {
@@ -14824,6 +14900,7 @@ function terapkanTemaAwal() {
 
 function toggleTema() {
   const modeSekarang = el('app-web').style.display !== 'none' ? 'web' : 'mobile';
+  if (modeSekarang === 'mobile') return; // dark mode dikunci permanen di mobile, toggle nggak berlaku
   const defaultAwal = modeSekarang === 'web' ? 'terang' : 'gelap';
   const sedangTerang = modeSekarang === 'web'
     ? !document.body.classList.contains('tema-gelap')
@@ -15861,6 +15938,373 @@ let ledgerCurrentTrack = null;
 let ledgerTorchOn = false;
 let lastLedgerCameraResult = '';
 let lastLedgerCameraTime = 0;
+
+/* ============================================================================
+   CATAT MEMO GUDANG (mobile) - gabungan Minta Stock + Catat Barang Masuk +
+   Lapor Hilang/Rusak. Reuse endpoint backend yang sama persis kayak versi web,
+   cuma tampilannya kartu (bukan tabel) biar pas dioperasikan satu tangan di HP.
+   ============================================================================ */
+let mgmTabAktif = 'mintastock';
+let mgmCarts = { mintastock: [], barangmasuk: [], hilangrusak: [] };
+let mgmStokRealtimeCache = {};
+let mgmZxingReader = null;
+let mgmInputMode = 'manual';
+let mgmFotoTargetIdx = null; // dipakai pas mode kamera lagi ambil foto bukti (bukan scan barcode)
+
+const MGM_LABEL = { mintastock: 'Minta Stock', barangmasuk: 'Catat Barang Masuk', hilangrusak: 'Lapor Hilang/Rusak' };
+
+function mgmMuatDraftLokal() {
+  try {
+    const raw = localStorage.getItem('mgm_draft_carts');
+    if (raw) mgmCarts = Object.assign({ mintastock: [], barangmasuk: [], hilangrusak: [] }, JSON.parse(raw));
+  } catch (e) {}
+}
+function mgmSimpanDraftLokal() {
+  try { localStorage.setItem('mgm_draft_carts', JSON.stringify(mgmCarts)); } catch (e) {}
+}
+mgmMuatDraftLokal();
+
+function bukaMemoGudangMobile() {
+  hideAllScreens();
+  el('screen-memo-gudang').style.display = 'flex';
+  mgmGantiTab('mintastock');
+}
+
+function mgmGantiTab(tab) {
+  mgmTabAktif = tab;
+  ['mintastock', 'barangmasuk', 'hilangrusak'].forEach(t => {
+    el('mgm-tab-' + t).classList.toggle('active', t === tab);
+  });
+  el('mgm-sku-input').value = '';
+  el('mgm-saran').style.display = 'none';
+  el('mgm-btn-checklist-wrap').style.display = (tab === 'barangmasuk') ? 'block' : 'none';
+  mgmRenderCart();
+}
+
+function mgmSetInputMode(mode) {
+  mgmInputMode = mode;
+  el('mgm-toggle-manual').classList.toggle('active', mode === 'manual');
+  el('mgm-toggle-camera').classList.toggle('active', mode === 'camera');
+  if (mode === 'manual') {
+    mgmStopCamera();
+    el('mgm-input-wrap').style.display = 'flex';
+    el('mgm-camera-wrap').style.display = 'none';
+    el('mgm-sku-input').focus();
+  } else {
+    el('mgm-input-wrap').style.display = 'none';
+    el('mgm-camera-wrap').style.display = 'flex';
+    mgmStartCamera();
+  }
+}
+
+let mgmLastScanResult = null, mgmLastScanTime = 0;
+async function mgmStartCamera() {
+  el('mgm-camera-error').textContent = '';
+  if (!window.ZXing) { el('mgm-camera-error').textContent = '⚠️ Library kamera gagal dimuat.'; return; }
+  try {
+    mgmZxingReader = new ZXing.BrowserMultiFormatReader();
+    const videoEl = el('mgm-camera-video');
+    await mgmZxingReader.decodeFromConstraints({ video: { facingMode: 'environment' } }, videoEl, (result) => {
+      if (result) {
+        const text = result.getText();
+        const now = Date.now();
+        if (text === mgmLastScanResult && (now - mgmLastScanTime) < 2000) return; // cegah scan dobel beruntun
+        mgmLastScanResult = text; mgmLastScanTime = now;
+        playBeep();
+        mgmTambahItemKeCart(text);
+      }
+    });
+  } catch (err) { el('mgm-camera-error').textContent = 'Tidak bisa akses kamera: ' + err.message; }
+}
+function mgmStopCamera() {
+  if (mgmZxingReader) { try { mgmZxingReader.reset(); } catch (e) {} mgmZxingReader = null; }
+}
+
+/* ===== Cari produk live + tambah item ===== */
+async function mgmCariProdukLive() {
+  const kata = el('mgm-sku-input').value.toLowerCase().trim();
+  const saranEl = el('mgm-saran');
+  if (kata.length < 2) { saranEl.style.display = 'none'; return; }
+  if (katalogProdukCache.length === 0) await katalogFetchProduk();
+  const hasil = katalogProdukCache.filter(pr => pr.sku.toLowerCase().includes(kata) || pr.nama.toLowerCase().includes(kata)).slice(0, 6);
+  if (hasil.length === 0) { saranEl.innerHTML = '<div class="mg-saran-item" style="color:var(--text-dim);">Nggak ketemu produk cocok.</div>'; saranEl.style.display = 'block'; return; }
+  saranEl.innerHTML = hasil.map(pr => `<div class="mg-saran-item" onclick="mgmPilihSaran('${pr.sku.replace(/'/g, "\\'")}')"><b>${escapeHtml(pr.sku)}</b>${escapeHtml(pr.nama)}</div>`).join('');
+  saranEl.style.display = 'block';
+}
+function mgmPilihSaran(sku) {
+  mgmTambahItemKeCart(sku);
+  el('mgm-sku-input').value = '';
+  el('mgm-saran').style.display = 'none';
+  el('mgm-sku-input').focus();
+}
+
+// SENGAJA TIDAK ADA validasi SKU harus terdaftar di Master Produk - masih draft/memo,
+// belum ngaruh ke stock beneran (sama kayak alasan di versi web).
+async function mgmTambahItemDariInput() {
+  const skuInput = el('mgm-sku-input').value.trim();
+  if (!skuInput) return;
+  if (katalogProdukCache.length === 0) await katalogFetchProduk();
+  let produk = katalogProdukCache.find(pr => pr.sku.toLowerCase() === skuInput.toLowerCase());
+  if (!produk) produk = katalogProdukCache.find(pr => pr.sku.toLowerCase().includes(skuInput.toLowerCase()) || pr.nama.toLowerCase().includes(skuInput.toLowerCase()));
+  mgmTambahItemKeCart(produk ? produk.sku : skuInput);
+  el('mgm-sku-input').value = '';
+  el('mgm-saran').style.display = 'none';
+}
+
+function mgmTambahItemKeCart(sku) {
+  const cart = mgmCarts[mgmTabAktif];
+  const sudahAda = cart.find(it => it.sku === sku);
+  if (sudahAda) {
+    sudahAda.qty = (sudahAda.qty || 0) + 1;
+  } else {
+    const produk = katalogProdukCache.find(pr => pr.sku === sku);
+    cart.push({ sku, nama: produk ? produk.nama : sku, qty: 1, catatan: '', fotoUrl: '' });
+    if (mgmTabAktif === 'mintastock') mgmMintaStokRealtime();
+  }
+  mgmSimpanDraftLokal();
+  mgmRenderCart();
+}
+
+async function mgmMintaStokRealtime() {
+  try {
+    const data = await postJson({ aksi: 'lihat_stok_banyak_sku', email: currentUserEmail() });
+    if (data.success) { mgmStokRealtimeCache = data.peta; mgmRenderCart(); }
+  } catch (err) {}
+}
+
+function mgmUbahQty(idx, delta) {
+  const cart = mgmCarts[mgmTabAktif];
+  const qtyBaru = (parseFloat(cart[idx].qty) || 0) + delta;
+  cart[idx].qty = qtyBaru < 0 ? 0 : qtyBaru;
+  mgmSimpanDraftLokal();
+  mgmRenderCart();
+}
+function mgmSetQtyLangsung(idx, value) {
+  const qty = parseFloat(value) || 0;
+  mgmCarts[mgmTabAktif][idx].qty = qty < 0 ? 0 : qty;
+  mgmSimpanDraftLokal();
+}
+function mgmUbahCatatan(idx, value) {
+  mgmCarts[mgmTabAktif][idx].catatan = value;
+  mgmSimpanDraftLokal();
+}
+function mgmHapusItem(idx) {
+  mgmCarts[mgmTabAktif].splice(idx, 1);
+  mgmSimpanDraftLokal();
+  mgmRenderCart();
+}
+
+/* ===== Render cart - kartu (bukan tabel), pas buat mobile ===== */
+function mgmRenderCart() {
+  const cart = mgmCarts[mgmTabAktif];
+  el('mgm-cart-empty').style.display = cart.length === 0 ? 'block' : 'none';
+
+  const itemChecklist = cart.filter(it => it.dariChecklist);
+  const progresEl = el('mgm-progres');
+  if (mgmTabAktif === 'barangmasuk' && itemChecklist.length > 0) {
+    const disentuh = itemChecklist.filter(it => (parseFloat(it.qty) || 0) > 0).length;
+    progresEl.textContent = `Progres Cek Fisik: ${disentuh} / ${itemChecklist.length} SKU`;
+    progresEl.style.display = 'block';
+  } else {
+    progresEl.style.display = 'none';
+  }
+
+  el('mgm-cart-list').innerHTML = cart.map((it, idx) => {
+    const ghost = it.dariChecklist && (parseFloat(it.qty) || 0) <= 0;
+    const label3 = mgmTabAktif === 'mintastock' ? 'Sisa Stok' : (mgmTabAktif === 'hilangrusak' ? 'Keterangan' : 'Catatan / No. Surat Jalan');
+    const sisaStok = mgmTabAktif === 'mintastock' ? (mgmStokRealtimeCache[it.sku] ? mgmStokRealtimeCache[it.sku].stockSaatIni : '-') : null;
+    return `
+      <div class="section-box" style="width:100%; box-sizing:border-box; ${ghost ? 'opacity:0.45;' : ''}">
+        <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+          <div>
+            <div style="font-weight:800; font-size:14px; ${ghost ? 'font-style:italic;' : ''}">${escapeHtml(it.sku)}</div>
+            <div style="font-size:11.5px; color:var(--text-dim);">${escapeHtml(it.nama)}</div>
+            ${sisaStok !== null ? `<div style="font-size:11px; color:var(--text-dim); margin-top:2px;">Sisa Stok: ${sisaStok}</div>` : ''}
+          </div>
+          <button class="mg-hapus-btn" style="font-size:20px; padding:4px 8px;" onclick="mgmHapusItem(${idx})">✕</button>
+        </div>
+        <div style="display:flex; align-items:center; gap:10px; margin-top:10px;">
+          <button class="qty-step-btn" onclick="mgmUbahQty(${idx},-1)">−</button>
+          <input type="number" value="${it.qty}" style="width:60px; text-align:center; font-size:16px; font-weight:800; border-radius:8px; background:var(--bg); border:1px solid var(--panel-border); color:var(--text); padding:8px 2px;" onchange="mgmSetQtyLangsung(${idx},this.value)" />
+          <button class="qty-step-btn" onclick="mgmUbahQty(${idx},1)">+</button>
+          ${it.dariChecklist ? `<span style="font-size:12px; color:var(--text-dim); font-weight:700;">/ ${it.qtyTarget}</span>` : ''}
+        </div>
+        <div style="margin-top:8px;">
+          <div class="hint-text" style="margin-bottom:4px;">${label3}${mgmTabAktif === 'mintastock' ? ' (opsional)' : ''}</div>
+          <input type="text" value="${escapeHtml(it.catatan)}" placeholder="${mgmTabAktif === 'hilangrusak' ? 'Kenapa hilang/rusak?' : 'Opsional'}" style="width:100%; box-sizing:border-box; padding:9px; border-radius:8px; background:var(--bg); border:1px solid var(--panel-border); color:var(--text); font-family:inherit; font-size:13px;" onchange="mgmUbahCatatan(${idx},this.value)" />
+        </div>
+        ${mgmTabAktif === 'hilangrusak' ? `
+          <div style="margin-top:8px;">
+            ${it.fotoUrl ? `<img src="${it.fotoUrl}" style="width:56px; height:56px; object-fit:cover; border-radius:8px;" onclick="window.open('${it.fotoUrl}','_blank')" />`
+              : `<button class="toggle-btn" style="width:100%;" onclick="mgmAmbilFotoBukti(${idx})">📷 Ambil Foto Bukti</button>`}
+          </div>` : ''}
+      </div>`;
+  }).join('');
+}
+
+async function mgmAmbilFotoBukti(idx) {
+  mgmFotoTargetIdx = idx;
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+    const videoSementara = document.createElement('video');
+    videoSementara.srcObject = stream; videoSementara.playsInline = true; videoSementara.muted = true;
+    await videoSementara.play();
+    await new Promise(r => setTimeout(r, 400)); // kasih jeda dikit biar kamera fokus dulu
+    const canvas = document.createElement('canvas');
+    canvas.width = videoSementara.videoWidth; canvas.height = videoSementara.videoHeight;
+    canvas.getContext('2d').drawImage(videoSementara, 0, 0);
+    stream.getTracks().forEach(t => t.stop());
+    const base64 = canvas.toDataURL('image/jpeg', 0.8).split(',')[1];
+    const it = mgmCarts.hilangrusak[idx];
+    it.fotoBase64Pending = base64;
+    it.fotoUrl = 'data:image/jpeg;base64,' + base64;
+    mgmSimpanDraftLokal();
+    mgmRenderCart();
+  } catch (err) { alert('Gagal ambil foto: ' + err.message); }
+}
+
+/* ===== Checklist Invoice (khusus tab Barang Masuk) ===== */
+let mgmChecklistDaftarInvoice = [];
+let mgmChecklistInvoiceSudahDicek = new Set();
+
+async function mgmBukaChecklist() {
+  hideAllScreens();
+  el('screen-memo-gudang-checklist').style.display = 'flex';
+  el('mgm-checklist-cari').value = '';
+  el('mgm-checklist-list').innerHTML = '<div style="text-align:center; color:var(--text-dim); padding:20px 0; font-size:12.5px;">Memuat daftar invoice...</div>';
+  try {
+    const [dataInvoice, dataRiwayat] = await Promise.all([
+      postJson({ aksi: 'lihat_daftar_invoice_manual_checklist', email: currentUserEmail() }),
+      postJson({ aksi: 'lihat_daftar_memo_barang_masuk', email: currentUserEmail() })
+    ]);
+    if (!dataInvoice.success) { el('mgm-checklist-list').innerHTML = `<div style="color:var(--danger); font-size:12.5px;">Gagal: ${escapeHtml(dataInvoice.error||'')}</div>`; return; }
+    mgmChecklistDaftarInvoice = (dataInvoice.daftar || []).filter(inv => inv.statusDicek === 'Belum Dicek');
+    mgmChecklistInvoiceSudahDicek = new Set((dataRiwayat.success ? dataRiwayat.daftar : []).map(m => m.noInvoiceTerkait).filter(no => no && no !== '-'));
+    mgmRenderDaftarChecklist();
+  } catch (err) { el('mgm-checklist-list').innerHTML = `<div style="color:var(--danger); font-size:12.5px;">Gagal terhubung: ${escapeHtml(err.message)}</div>`; }
+}
+
+function mgmRenderDaftarChecklist() {
+  const cari = (el('mgm-checklist-cari')?.value || '').toLowerCase().trim();
+  let daftar = mgmChecklistDaftarInvoice;
+  if (cari) daftar = daftar.filter(inv => inv.noInvoice.toLowerCase().includes(cari) || inv.namaSupplier.toLowerCase().includes(cari));
+  el('mgm-checklist-empty').style.display = daftar.length === 0 ? 'block' : 'none';
+  el('mgm-checklist-list').innerHTML = daftar.map(inv => {
+    const sudahDicek = mgmChecklistInvoiceSudahDicek.has(inv.noInvoice);
+    return `
+    <div class="section-box" style="width:100%; box-sizing:border-box; ${sudahDicek ? 'opacity:0.5;' : ''}" onclick="mgmPilihInvoiceChecklist('${inv.noInvoice.replace(/'/g, "\\'")}')">
+      <div style="display:flex; align-items:center; gap:8px;">
+        <b style="font-size:14px;">${escapeHtml(inv.noInvoice)}</b>
+        ${sudahDicek ? '<span class="mode-badge" style="background:#2f9e6e; margin:0; font-size:9.5px;">✓ Sudah Dicek</span>' : ''}
+      </div>
+      <div style="font-size:11.5px; color:var(--text-dim); margin-top:4px;">${escapeHtml(inv.namaSupplier)} · ${escapeHtml(inv.tanggal)} · Rp ${Number(inv.total).toLocaleString('id-ID')}</div>
+    </div>`;
+  }).join('');
+}
+
+async function mgmPilihInvoiceChecklist(noInvoice) {
+  el('mgm-checklist-list').innerHTML = '<div style="text-align:center; color:var(--text-dim); padding:20px 0; font-size:12.5px;">Memuat item invoice...</div>';
+  try {
+    const data = await postJson({ aksi: 'lihat_detail_invoice_manual_checklist', noInvoice, email: currentUserEmail() });
+    if (!data.success) { alert('Gagal ambil detail: ' + (data.error || '')); mgmRenderDaftarChecklist(); return; }
+    mgmCarts.barangmasuk = (data.daftar || []).map(it => ({ sku: it.sku, nama: it.nama, qty: 0, catatan: '', qtyTarget: it.qtyInvoice, dariChecklist: true, noInvoiceAsal: noInvoice }));
+    mgmSimpanDraftLokal();
+    hideAllScreens();
+    el('screen-memo-gudang').style.display = 'flex';
+    mgmRenderCart();
+  } catch (err) { alert('Gagal terhubung: ' + err.message); mgmRenderDaftarChecklist(); }
+}
+
+/* ===== Riwayat (read-only di mobile - eksekusi/approve tetap dari web/kantor) ===== */
+async function mgmBukaRiwayat() {
+  hideAllScreens();
+  el('screen-memo-gudang-riwayat').style.display = 'flex';
+  el('mgm-riwayat-judul').textContent = 'Riwayat ' + MGM_LABEL[mgmTabAktif];
+  el('mgm-riwayat-list').innerHTML = '<div style="text-align:center; color:var(--text-dim); padding:20px 0; font-size:12.5px;">Memuat...</div>';
+  const aksiMap = { mintastock: 'lihat_daftar_memo_minta_stock', barangmasuk: 'lihat_daftar_memo_barang_masuk', hilangrusak: 'lihat_daftar_memo_hilang_rusak' };
+  try {
+    const data = await postJson({ aksi: aksiMap[mgmTabAktif], email: currentUserEmail() });
+    if (!data.success) { el('mgm-riwayat-list').innerHTML = `<div style="color:var(--danger); font-size:12.5px;">Gagal: ${escapeHtml(data.error||'')}</div>`; return; }
+    const daftar = data.daftar || [];
+    el('mgm-riwayat-empty').style.display = daftar.length === 0 ? 'block' : 'none';
+    el('mgm-riwayat-list').innerHTML = daftar.map(m => {
+      const selesai = m.status === 'Bisa PO Stock' || m.status === 'Dieksekusi' || m.status === 'Disetujui';
+      return `
+      <div class="section-box" style="width:100%; box-sizing:border-box; ${selesai ? 'opacity:0.55;' : ''}">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <b style="font-size:13.5px;">${escapeHtml(m.noMemo)}</b>
+          <span class="mode-badge" style="margin:0; font-size:9.5px; background:${selesai ? '#2f9e6e' : '#c99a1f'};">${escapeHtml(m.status || '-')}</span>
+        </div>
+        <div style="font-size:11px; color:var(--text-dim); margin-top:4px;">${escapeHtml(m.tanggal)}${m.noInvoiceTerkait && m.noInvoiceTerkait !== '-' ? ' · Invoice: ' + escapeHtml(m.noInvoiceTerkait) : ''}</div>
+      </div>`;
+    }).join('');
+  } catch (err) { el('mgm-riwayat-list').innerHTML = `<div style="color:var(--danger); font-size:12.5px;">Gagal terhubung: ${escapeHtml(err.message)}</div>`; }
+}
+
+/* ===== Submit - 1 fungsi dispatcher, dipanggil dari tombol "Kirim Memo" yang sama di 3 tab ===== */
+async function mgmSubmit() {
+  if (mgmTabAktif === 'mintastock') return mgmSubmitMintaStock();
+  if (mgmTabAktif === 'barangmasuk') return mgmSubmitBarangMasuk();
+  if (mgmTabAktif === 'hilangrusak') return mgmSubmitHilangRusak();
+}
+
+async function mgmSubmitMintaStock() {
+  const items = mgmCarts.mintastock.filter(it => it.qty > 0);
+  const statusEl = el('mgm-status');
+  if (items.length === 0) { statusEl.textContent = '✗ Keranjang kosong atau semua qty 0.'; statusEl.className = 'status-text err'; return; }
+  statusEl.textContent = 'Mengirim...'; statusEl.className = 'status-text';
+  const itemsKirim = items.map(it => ({ sku: it.sku, nama: it.nama, qtyMinta: it.qty, catatan: it.catatan, sisaStok: mgmStokRealtimeCache[it.sku] ? mgmStokRealtimeCache[it.sku].stockSaatIni : 0 }));
+  try {
+    const data = await postJson({ aksi: 'simpan_memo_minta_stock', items: itemsKirim, email: currentUserEmail() });
+    if (data.success) {
+      playBeep();
+      statusEl.textContent = `✓ Memo ${data.noMemo} terkirim!`; statusEl.className = 'status-text ok';
+      mgmCarts.mintastock = []; mgmSimpanDraftLokal(); mgmRenderCart();
+    } else { statusEl.textContent = '✗ Gagal: ' + (data.error || ''); statusEl.className = 'status-text err'; }
+  } catch (err) { statusEl.textContent = '✗ Gagal terhubung: ' + err.message; statusEl.className = 'status-text err'; }
+}
+
+async function mgmSubmitBarangMasuk() {
+  const items = mgmCarts.barangmasuk.filter(it => it.qty > 0);
+  const statusEl = el('mgm-status');
+  if (items.length === 0) { statusEl.textContent = '✗ Keranjang kosong atau semua qty 0.'; statusEl.className = 'status-text err'; return; }
+  statusEl.textContent = 'Mengirim...'; statusEl.className = 'status-text';
+  const itemsKirim = items.map(it => ({ sku: it.sku, qtyMasuk: it.qty, catatan: it.catatan }));
+  const itemChecklistSumber = items.find(it => it.noInvoiceAsal);
+  try {
+    const data = await postJson({ aksi: 'simpan_memo_barang_masuk', items: itemsKirim, noInvoiceTerkait: itemChecklistSumber ? itemChecklistSumber.noInvoiceAsal : '', email: currentUserEmail() });
+    if (data.success) {
+      playBeep();
+      statusEl.textContent = `✓ Memo ${data.noMemo} terkirim, menunggu dieksekusi Back Office.`; statusEl.className = 'status-text ok';
+      mgmCarts.barangmasuk = []; mgmSimpanDraftLokal(); mgmRenderCart();
+    } else { statusEl.textContent = '✗ Gagal: ' + (data.error || ''); statusEl.className = 'status-text err'; }
+  } catch (err) { statusEl.textContent = '✗ Gagal terhubung: ' + err.message; statusEl.className = 'status-text err'; }
+}
+
+async function mgmSubmitHilangRusak() {
+  const items = mgmCarts.hilangrusak.filter(it => it.qty > 0);
+  const statusEl = el('mgm-status');
+  if (items.length === 0) { statusEl.textContent = '✗ Keranjang kosong atau semua qty 0.'; statusEl.className = 'status-text err'; return; }
+  statusEl.textContent = 'Mengirim...'; statusEl.className = 'status-text';
+  const itemsKirim = items.map(it => ({ sku: it.sku, qty: it.qty, catatan: it.catatan }));
+  try {
+    const data = await postJson({ aksi: 'simpan_memo_hilang_rusak', items: itemsKirim, email: currentUserEmail() });
+    if (!data.success) { statusEl.textContent = '✗ Gagal: ' + (data.error || ''); statusEl.className = 'status-text err'; return; }
+
+    const detailData = await postJson({ aksi: 'lihat_detail_memo_hilang_rusak', noMemo: data.noMemo, email: currentUserEmail() });
+    if (detailData.success) {
+      for (let i = 0; i < items.length; i++) {
+        if (items[i].fotoBase64Pending) {
+          const baris = detailData.daftar[i];
+          if (baris) await postJson({ aksi: 'upload_foto_memo_hilang_rusak', row: baris.row, base64: items[i].fotoBase64Pending, mimeType: 'image/jpeg', email: currentUserEmail() });
+        }
+      }
+    }
+    playBeep();
+    statusEl.textContent = `✓ Laporan ${data.noMemo} terkirim!`; statusEl.className = 'status-text ok';
+    mgmCarts.hilangrusak = []; mgmSimpanDraftLokal(); mgmRenderCart();
+  } catch (err) { statusEl.textContent = '✗ Gagal terhubung: ' + err.message; statusEl.className = 'status-text err'; }
+}
 
 function openLedgerStock(skuAwal) {
   hideAllScreens();
