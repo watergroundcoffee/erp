@@ -1087,6 +1087,38 @@ const LOGO_OMI_B64 = "/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAMCAgMCAgMDAwMEAwMEBQgFBQ
   .mg-cart-table tr.mg-ghost { opacity: 0.45; }
   .mg-cart-table tr.mg-ghost td b { font-style: italic; }
 
+  /* ===== Card compact mobile - Memo Gudang (4 tab) ===== */
+  .mgm-card { border: 1px solid var(--panel-border); border-radius: 10px; padding: 10px 12px; background: var(--panel); width: 100%; box-sizing: border-box; }
+  .mgm-card.mgm-ghost { opacity: 0.45; }
+  .mgm-card.mgm-ghost b { font-style: italic; }
+  .mgm-card-row1 { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }
+  .mgm-card-title { flex: 1; min-width: 0; }
+  .mgm-card-title b { font-size: 14px; display: block; }
+  .mgm-card-nama { font-size: 11px; color: var(--text-dim); display: block; margin-top: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .mgm-card-x {
+    flex: none; width: 34px; height: 34px; border-radius: 8px; border: 1px solid var(--panel-border);
+    background: none; color: #d9534f; font-size: 17px; display: flex; align-items: center; justify-content: center;
+  }
+  .mgm-card-row2 { display: flex; align-items: center; gap: 10px; margin-top: 9px; flex-wrap: nowrap; }
+  .mgm-qty-inline { display: flex; align-items: center; gap: 6px; flex: none; }
+  .mgm-qty-btn {
+    width: 36px; height: 36px; border-radius: 9px; border: 1px solid var(--panel-border); background: var(--bg);
+    font-size: 19px; font-weight: 700; display: flex; align-items: center; justify-content: center; color: var(--text);
+  }
+  .mgm-qty-input-sm {
+    width: 54px; height: 36px; text-align: center; font-size: 15px; font-weight: 800; border-radius: 9px;
+    background: var(--bg); border: 1px solid var(--panel-border); color: var(--text);
+  }
+  .mgm-card-meta { font-size: 11.5px; color: var(--text-dim); font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .mgm-card-meta.mgm-selisih-plus { color: #e07a2f; }
+  .mgm-card-meta.mgm-selisih-minus { color: #d9534f; }
+  .mgm-card-meta.mgm-selisih-nol { color: #2f9e6e; }
+  .mgm-card-catatan {
+    width: 100%; box-sizing: border-box; margin-top: 8px; padding: 8px 10px; border-radius: 8px;
+    background: var(--bg); border: 1px solid var(--panel-border); color: var(--text); font-size: 12.5px; font-family: inherit;
+  }
+  .mgm-card-foto-btn { width: 100%; margin-top: 8px; }
+
   /* ===== Responsif mobile - touch target diperbesar, cart jadi kartu (bukan tabel lebar) ===== */
   @media (max-width: 700px) {
     .mg-input-row { flex-wrap: wrap; }
@@ -1756,11 +1788,13 @@ const LOGO_OMI_B64 = "/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAMCAgMCAgMDAwMEAwMEBQgFBQ
     <div id="screen-memo-gudang" style="display:none; flex-direction:column; align-items:center; gap:10px; width:100%;">
       <button class="back-btn" onclick="hideAllScreens(); el('screen-menu').style.display='flex';">← Kembali ke Menu</button>
       <div class="title">Catat Memo Gudang</div>
+      <div id="mgm-subjudul" style="font-size:11.5px; color:var(--text-dim); text-align:center; margin-top:-6px; padding:0 8px;"></div>
 
       <div class="input-toggle" style="width:100%;">
-        <button class="toggle-btn active" id="mgm-tab-mintastock" onclick="mgmGantiTab('mintastock')" style="flex:1; font-size:12px;">Minta Stock</button>
-        <button class="toggle-btn" id="mgm-tab-barangmasuk" onclick="mgmGantiTab('barangmasuk')" style="flex:1; font-size:12px;">Barang Masuk</button>
-        <button class="toggle-btn" id="mgm-tab-hilangrusak" onclick="mgmGantiTab('hilangrusak')" style="flex:1; font-size:12px;">Hilang/Rusak</button>
+        <button class="toggle-btn active" id="mgm-tab-mintastock" onclick="mgmGantiTab('mintastock')" style="flex:1; font-size:11px;">Minta Stock</button>
+        <button class="toggle-btn" id="mgm-tab-barangmasuk" onclick="mgmGantiTab('barangmasuk')" style="flex:1; font-size:11px;">Barang Masuk</button>
+        <button class="toggle-btn" id="mgm-tab-hilangrusak" onclick="mgmGantiTab('hilangrusak')" style="flex:1; font-size:11px;">Hilang/Rusak</button>
+        <button class="toggle-btn" id="mgm-tab-stockopname" onclick="mgmGantiTab('stockopname')" style="flex:1; font-size:11px;">Stock Opname</button>
       </div>
 
       <div class="toolbar-row" style="width:100%;">
@@ -1793,6 +1827,13 @@ const LOGO_OMI_B64 = "/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAMCAgMCAgMDAwMEAwMEBQgFBQ
       </div>
 
       <div id="mgm-progres" style="display:none; width:100%; box-sizing:border-box; background:rgba(59,130,246,0.1); border:1px solid #3b82f6; border-radius:8px; padding:8px 14px; font-size:12.5px; font-weight:700; text-align:center;"></div>
+
+      <div id="mgm-list-header" style="display:none; width:100%; box-sizing:border-box; padding:0 4px;">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <span id="mgm-lh-kolom1" style="font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.4px; color:var(--text-dim);">SKU</span>
+          <span id="mgm-lh-kolom2" style="font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.4px; color:var(--text-dim);">Qty</span>
+        </div>
+      </div>
 
       <div id="mgm-cart-list" style="width:100%; display:flex; flex-direction:column; gap:8px;"></div>
 
@@ -4569,6 +4610,7 @@ const LOGO_OMI_B64 = "/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAMCAgMCAgMDAwMEAwMEBQgFBQ
             <button class="web-chart-toggle-btn active" id="mg-tab-mintastock" onclick="mgGantiTab('mintastock')">Minta Stock</button>
             <button class="web-chart-toggle-btn" id="mg-tab-barangmasuk" onclick="mgGantiTab('barangmasuk')">Catat Barang Masuk</button>
             <button class="web-chart-toggle-btn" id="mg-tab-hilangrusak" onclick="mgGantiTab('hilangrusak')">Lapor Hilang/Rusak</button>
+            <button class="web-chart-toggle-btn" id="mg-tab-stockopname" onclick="mgGantiTab('stockopname')">Stock Opname</button>
           </div>
 
           <!-- ===== TAB: MINTA STOCK ===== -->
@@ -4687,6 +4729,40 @@ const LOGO_OMI_B64 = "/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAMCAgMCAgMDAwMEAwMEBQgFBQ
                 </table>
               </div>
               <div id="mg-lhr-riwayat-paginasi"></div>
+            </div>
+          </div>
+
+          <!-- ===== TAB: STOCK OPNAME (review/verifikasi Back Office - input datanya dari mobile) ===== -->
+          <div id="mg-view-stockopname" style="display:none;">
+            <div class="web-panel" style="max-width:720px;">
+              <div class="web-panel-header"><span>Riwayat Stock Opname</span></div>
+              <div style="font-size:11.5px; color:var(--web-text-dim); margin-bottom:10px;">Hasil hitung fisik dari staff gudang lewat mobile. Klik No Memo buat lihat rincian selisih per SKU dan tandai terverifikasi.</div>
+              <div class="web-table-wrap">
+                <table class="web-table">
+                  <thead><tr><th>No Memo</th><th>Tanggal</th><th>Status</th><th>Dicatat Oleh</th><th></th></tr></thead>
+                  <tbody id="mg-so-riwayat-body"></tbody>
+                </table>
+              </div>
+              <div class="web-placeholder" id="mg-so-riwayat-empty" style="display:none;">Belum ada Stock Opname dari mobile.</div>
+              <div id="mg-so-riwayat-paginasi"></div>
+            </div>
+          </div>
+
+          <!-- Modal Detail Stock Opname -->
+          <div id="mg-modal-so-detail" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:260; align-items:center; justify-content:center;">
+            <div class="web-panel" style="max-width:560px; width:92%; max-height:82vh; overflow-y:auto;">
+              <div class="web-panel-header" style="display:flex; justify-content:space-between; align-items:center;">
+                <span>Detail Stock Opname - <span id="mg-so-detail-nomemo"></span></span>
+                <button class="web-btn-secondary" style="padding:4px 10px; margin:0;" onclick="mgTutupDetailSO()">✕</button>
+              </div>
+              <div class="web-table-wrap">
+                <table class="web-table">
+                  <thead><tr><th>SKU</th><th>Nama</th><th>Stok Sistem</th><th>Stok Fisik</th><th>Selisih</th><th>Catatan</th></tr></thead>
+                  <tbody id="mg-so-detail-body"></tbody>
+                </table>
+              </div>
+              <button class="web-btn-primary" id="mg-so-detail-btn-verifikasi" style="width:100%; margin-top:14px;" onclick="mgVerifikasiStockOpnameDariModal()">✓ Tandai Terverifikasi</button>
+              <div class="status-text" id="mg-so-detail-status" style="text-align:left; margin-top:6px;"></div>
             </div>
           </div>
         </div>
@@ -12069,10 +12145,11 @@ mgMuatDraftLokal();
 
 function mgGantiTab(tab) {
   mgTabAktif = tab;
-  ['mintastock', 'barangmasuk', 'hilangrusak'].forEach(t => {
+  ['mintastock', 'barangmasuk', 'hilangrusak', 'stockopname'].forEach(t => {
     el('mg-tab-' + t).classList.toggle('active', t === tab);
     el('mg-view-' + t).style.display = t === tab ? 'block' : 'none';
   });
+  if (tab === 'stockopname') { mgFetchStockOpname(); return; }
   mgRenderCart(tab);
   if (tab === 'mintastock') mgFetchRiwayat('mintastock');
   else if (tab === 'barangmasuk') mgFetchRiwayat('barangmasuk');
@@ -12409,6 +12486,90 @@ async function mgApproveHilangRusak(noMemo) {
   if (!confirm(`Setujui memo "${noMemo}"? Stock bakal otomatis dikurangi sebagai penyesuaian.`)) return;
   const data = await postJson({ aksi: 'approve_memo_hilang_rusak', noMemo, email: currentUserEmail() });
   if (data.success) { playBeep(); mgFetchRiwayat('hilangrusak'); } else { alert('Gagal: ' + (data.error || '')); }
+}
+
+/* ===== Stock Opname (web = review/verifikasi Back Office, input datanya dari mobile) ===== */
+let mgStockOpnameCache = [];
+let mgStockOpnamePaginasiState = buatStatePaginasi();
+let mgSoDetailNoMemoAktif = null;
+
+async function mgFetchStockOpname() {
+  el('mg-so-riwayat-body').innerHTML = '<tr><td colspan="5" style="text-align:center; color:var(--web-text-dim);">Memuat...</td></tr>';
+  try {
+    const data = await postJson({ aksi: 'lihat_daftar_memo_stock_opname', email: currentUserEmail() });
+    if (!data.success) { el('mg-so-riwayat-body').innerHTML = `<tr><td colspan="5" style="text-align:center; color:var(--web-danger);">Gagal: ${escapeHtml(data.error||'')}</td></tr>`; return; }
+    mgStockOpnameCache = data.daftar || [];
+    mgRenderStockOpname();
+  } catch (err) {
+    el('mg-so-riwayat-body').innerHTML = `<tr><td colspan="5" style="text-align:center; color:var(--web-danger);">Gagal terhubung: ${escapeHtml(err.message)}</td></tr>`;
+  }
+}
+
+function mgRenderStockOpname() {
+  el('mg-so-riwayat-empty').style.display = mgStockOpnameCache.length === 0 ? 'block' : 'none';
+  const halamanIni = halamanDataPaginasi(mgStockOpnameCache, mgStockOpnamePaginasiState);
+  el('mg-so-riwayat-body').innerHTML = halamanIni.map(m => {
+    const selesai = m.status === 'Terverifikasi';
+    return `
+      <tr style="${selesai ? 'opacity:0.55;' : ''}">
+        <td><a href="javascript:void(0)" onclick="mgBukaDetailSO('${m.noMemo.replace(/'/g,"\\'")}')" style="color:var(--web-info); font-weight:600; text-decoration:none;">${escapeHtml(m.noMemo)}</a></td>
+        <td style="font-size:11px; color:var(--web-text-dim);">${escapeHtml(m.tanggal)}</td>
+        <td><span class="web-status-pill ${selesai ? 'dikirim' : 'aktif'}">${escapeHtml(m.status)}</span></td>
+        <td style="font-size:11px;">${escapeHtml(m.dicatatOleh)}</td>
+        <td><button class="web-chart-toggle-btn" style="font-size:11px;" onclick="mgBukaDetailSO('${m.noMemo.replace(/'/g,"\\'")}')">Lihat Detail</button></td>
+      </tr>`;
+  }).join('');
+  renderPaginasi('mg-so-riwayat-paginasi', mgStockOpnameCache.length, mgStockOpnamePaginasiState, mgRenderStockOpname);
+}
+
+async function mgBukaDetailSO(noMemo) {
+  mgSoDetailNoMemoAktif = noMemo;
+  el('mg-so-detail-nomemo').textContent = noMemo;
+  el('mg-so-detail-body').innerHTML = '<tr><td colspan="6" style="text-align:center; color:var(--web-text-dim);">Memuat...</td></tr>';
+  el('mg-so-detail-status').textContent = '';
+  el('mg-modal-so-detail').style.display = 'flex';
+
+  const memoInfo = mgStockOpnameCache.find(m => m.noMemo === noMemo);
+  el('mg-so-detail-btn-verifikasi').style.display = (memoInfo && memoInfo.status === 'Terverifikasi') ? 'none' : 'block';
+
+  try {
+    const data = await postJson({ aksi: 'lihat_detail_memo_stock_opname', noMemo, email: currentUserEmail() });
+    if (!data.success) { el('mg-so-detail-body').innerHTML = `<tr><td colspan="6" style="text-align:center; color:var(--web-danger);">Gagal: ${escapeHtml(data.error||'')}</td></tr>`; return; }
+    el('mg-so-detail-body').innerHTML = (data.daftar || []).map(it => {
+      const warna = it.selisih === 0 ? 'var(--web-accent)' : (it.selisih > 0 ? '#e07a2f' : 'var(--web-danger)');
+      return `
+        <tr>
+          <td>${escapeHtml(it.sku)}</td>
+          <td>${escapeHtml(it.nama)}</td>
+          <td>${it.stokSistem}</td>
+          <td style="font-weight:600;">${it.stokFisik}</td>
+          <td style="font-weight:700; color:${warna};">${it.selisih > 0 ? '+' : ''}${it.selisih}</td>
+          <td style="font-size:11.5px; color:var(--web-text-dim);">${escapeHtml(it.catatan || '-')}</td>
+        </tr>`;
+    }).join('');
+  } catch (err) {
+    el('mg-so-detail-body').innerHTML = `<tr><td colspan="6" style="text-align:center; color:var(--web-danger);">Gagal terhubung: ${escapeHtml(err.message)}</td></tr>`;
+  }
+}
+
+function mgTutupDetailSO() {
+  el('mg-modal-so-detail').style.display = 'none';
+  mgSoDetailNoMemoAktif = null;
+}
+
+async function mgVerifikasiStockOpnameDariModal() {
+  if (!mgSoDetailNoMemoAktif) return;
+  const statusEl = el('mg-so-detail-status');
+  setLoadingDots(statusEl, 'Menyimpan');
+  try {
+    const data = await postJson({ aksi: 'verifikasi_memo_stock_opname', noMemo: mgSoDetailNoMemoAktif, email: currentUserEmail() });
+    stopLoadingDots(statusEl);
+    if (data.success) {
+      playBeep();
+      statusEl.textContent = '✓ Ditandai terverifikasi.'; statusEl.className = 'status-text ok';
+      setTimeout(() => { mgTutupDetailSO(); mgFetchStockOpname(); }, 700);
+    } else { statusEl.textContent = '✗ Gagal: ' + (data.error || ''); statusEl.className = 'status-text err'; }
+  } catch (err) { stopLoadingDots(statusEl); statusEl.textContent = '✗ Gagal terhubung: ' + err.message; statusEl.className = 'status-text err'; }
 }
 
 /* ===== Submit tiap tab ===== */
@@ -15945,18 +16106,18 @@ let lastLedgerCameraTime = 0;
    cuma tampilannya kartu (bukan tabel) biar pas dioperasikan satu tangan di HP.
    ============================================================================ */
 let mgmTabAktif = 'mintastock';
-let mgmCarts = { mintastock: [], barangmasuk: [], hilangrusak: [] };
+let mgmCarts = { mintastock: [], barangmasuk: [], hilangrusak: [], stockopname: [] };
 let mgmStokRealtimeCache = {};
 let mgmZxingReader = null;
 let mgmInputMode = 'manual';
 let mgmFotoTargetIdx = null; // dipakai pas mode kamera lagi ambil foto bukti (bukan scan barcode)
 
-const MGM_LABEL = { mintastock: 'Minta Stock', barangmasuk: 'Catat Barang Masuk', hilangrusak: 'Lapor Hilang/Rusak' };
+const MGM_LABEL = { mintastock: 'Minta Stock', barangmasuk: 'Catat Barang Masuk', hilangrusak: 'Lapor Hilang/Rusak', stockopname: 'Stock Opname' };
 
 function mgmMuatDraftLokal() {
   try {
     const raw = localStorage.getItem('mgm_draft_carts');
-    if (raw) mgmCarts = Object.assign({ mintastock: [], barangmasuk: [], hilangrusak: [] }, JSON.parse(raw));
+    if (raw) mgmCarts = Object.assign({ mintastock: [], barangmasuk: [], hilangrusak: [], stockopname: [] }, JSON.parse(raw));
   } catch (e) {}
 }
 function mgmSimpanDraftLokal() {
@@ -15972,12 +16133,22 @@ function bukaMemoGudangMobile() {
 
 function mgmGantiTab(tab) {
   mgmTabAktif = tab;
-  ['mintastock', 'barangmasuk', 'hilangrusak'].forEach(t => {
+  ['mintastock', 'barangmasuk', 'hilangrusak', 'stockopname'].forEach(t => {
     el('mgm-tab-' + t).classList.toggle('active', t === tab);
   });
   el('mgm-sku-input').value = '';
   el('mgm-saran').style.display = 'none';
   el('mgm-btn-checklist-wrap').style.display = (tab === 'barangmasuk') ? 'block' : 'none';
+  el('mgm-btn-submit').textContent = 'Kirim Memo ' + MGM_LABEL[tab];
+  const labelKolom2 = { mintastock: 'Qty Minta', barangmasuk: 'Qty Masuk', hilangrusak: 'Qty', stockopname: 'Stok Fisik' };
+  el('mgm-lh-kolom2').textContent = labelKolom2[tab];
+  const subjudul = {
+    mintastock: 'Diajukan dulu, kantor review & konfirmasi sebelum lanjut ke pembelian.',
+    barangmasuk: 'Memo ini nanti diverifikasi & dieksekusi Back Office sebelum stock sistem beneran berubah.',
+    hilangrusak: 'Kantor perlu approve dulu sebelum stock dikurangi sebagai penyesuaian.',
+    stockopname: 'Hasil hitung fisik dikirim ke kantor buat diverifikasi.'
+  };
+  el('mgm-subjudul').textContent = subjudul[tab];
   mgmRenderCart();
 }
 
@@ -16059,7 +16230,7 @@ function mgmTambahItemKeCart(sku) {
   } else {
     const produk = katalogProdukCache.find(pr => pr.sku === sku);
     cart.push({ sku, nama: produk ? produk.nama : sku, qty: 1, catatan: '', fotoUrl: '' });
-    if (mgmTabAktif === 'mintastock') mgmMintaStokRealtime();
+    if (mgmTabAktif === 'mintastock' || mgmTabAktif === 'stockopname') mgmMintaStokRealtime();
   }
   mgmSimpanDraftLokal();
   mgmRenderCart();
@@ -16094,10 +16265,11 @@ function mgmHapusItem(idx) {
   mgmRenderCart();
 }
 
-/* ===== Render cart - kartu (bukan tabel), pas buat mobile ===== */
+/* ===== Render cart - kartu compact, dipakai bareng 4 tab ===== */
 function mgmRenderCart() {
   const cart = mgmCarts[mgmTabAktif];
   el('mgm-cart-empty').style.display = cart.length === 0 ? 'block' : 'none';
+  el('mgm-list-header').style.display = cart.length === 0 ? 'none' : 'block';
 
   const itemChecklist = cart.filter(it => it.dariChecklist);
   const progresEl = el('mgm-progres');
@@ -16111,33 +16283,44 @@ function mgmRenderCart() {
 
   el('mgm-cart-list').innerHTML = cart.map((it, idx) => {
     const ghost = it.dariChecklist && (parseFloat(it.qty) || 0) <= 0;
-    const label3 = mgmTabAktif === 'mintastock' ? 'Sisa Stok' : (mgmTabAktif === 'hilangrusak' ? 'Keterangan' : 'Catatan / No. Surat Jalan');
-    const sisaStok = mgmTabAktif === 'mintastock' ? (mgmStokRealtimeCache[it.sku] ? mgmStokRealtimeCache[it.sku].stockSaatIni : '-') : null;
+
+    // Meta info di baris qty - beda-beda per tab, tapi tetap 1 baris ringkas
+    let meta = '';
+    if (mgmTabAktif === 'mintastock') {
+      const sisaStok = mgmStokRealtimeCache[it.sku] ? mgmStokRealtimeCache[it.sku].stockSaatIni : '-';
+      meta = `<span class="mgm-card-meta">Sisa: ${sisaStok}</span>`;
+    } else if (mgmTabAktif === 'barangmasuk' && it.dariChecklist) {
+      meta = `<span class="mgm-card-meta">/ ${it.qtyTarget}</span>`;
+    } else if (mgmTabAktif === 'stockopname') {
+      const stokSistem = it.stokSistem !== undefined ? it.stokSistem : (mgmStokRealtimeCache[it.sku] ? mgmStokRealtimeCache[it.sku].stockSaatIni : 0);
+      const selisih = (parseFloat(it.qty) || 0) - stokSistem;
+      const kelasSelisih = selisih === 0 ? 'mgm-selisih-nol' : (selisih > 0 ? 'mgm-selisih-plus' : 'mgm-selisih-minus');
+      meta = `<span class="mgm-card-meta">Sistem: ${stokSistem}</span><span class="mgm-card-meta ${kelasSelisih}">Selisih: ${selisih > 0 ? '+' : ''}${selisih}</span>`;
+    }
+
     return `
-      <div class="section-box" style="width:100%; box-sizing:border-box; ${ghost ? 'opacity:0.45;' : ''}">
-        <div style="display:flex; justify-content:space-between; align-items:flex-start;">
-          <div>
-            <div style="font-weight:800; font-size:14px; ${ghost ? 'font-style:italic;' : ''}">${escapeHtml(it.sku)}</div>
-            <div style="font-size:11.5px; color:var(--text-dim);">${escapeHtml(it.nama)}</div>
-            ${sisaStok !== null ? `<div style="font-size:11px; color:var(--text-dim); margin-top:2px;">Sisa Stok: ${sisaStok}</div>` : ''}
+      <div class="mgm-card ${ghost ? 'mgm-ghost' : ''}">
+        <div class="mgm-card-row1">
+          <div class="mgm-card-title">
+            <b>${escapeHtml(it.sku)}</b>
+            <span class="mgm-card-nama">${escapeHtml(it.nama)}</span>
           </div>
-          <button class="mg-hapus-btn" style="font-size:20px; padding:4px 8px;" onclick="mgmHapusItem(${idx})">✕</button>
+          <button class="mgm-card-x" onclick="mgmHapusItem(${idx})">✕</button>
         </div>
-        <div style="display:flex; align-items:center; gap:10px; margin-top:10px;">
-          <button class="qty-step-btn" onclick="mgmUbahQty(${idx},-1)">−</button>
-          <input type="number" value="${it.qty}" style="width:60px; text-align:center; font-size:16px; font-weight:800; border-radius:8px; background:var(--bg); border:1px solid var(--panel-border); color:var(--text); padding:8px 2px;" onchange="mgmSetQtyLangsung(${idx},this.value)" />
-          <button class="qty-step-btn" onclick="mgmUbahQty(${idx},1)">+</button>
-          ${it.dariChecklist ? `<span style="font-size:12px; color:var(--text-dim); font-weight:700;">/ ${it.qtyTarget}</span>` : ''}
+        <div class="mgm-card-row2">
+          <div class="mgm-qty-inline">
+            <button class="mgm-qty-btn" onclick="mgmUbahQty(${idx},-1)">−</button>
+            <input class="mgm-qty-input-sm" type="number" value="${it.qty}" onchange="mgmSetQtyLangsung(${idx},this.value)" />
+            <button class="mgm-qty-btn" onclick="mgmUbahQty(${idx},1)">+</button>
+          </div>
+          ${meta}
         </div>
-        <div style="margin-top:8px;">
-          <div class="hint-text" style="margin-bottom:4px;">${label3}${mgmTabAktif === 'mintastock' ? ' (opsional)' : ''}</div>
-          <input type="text" value="${escapeHtml(it.catatan)}" placeholder="${mgmTabAktif === 'hilangrusak' ? 'Kenapa hilang/rusak?' : 'Opsional'}" style="width:100%; box-sizing:border-box; padding:9px; border-radius:8px; background:var(--bg); border:1px solid var(--panel-border); color:var(--text); font-family:inherit; font-size:13px;" onchange="mgmUbahCatatan(${idx},this.value)" />
-        </div>
-        ${mgmTabAktif === 'hilangrusak' ? `
-          <div style="margin-top:8px;">
-            ${it.fotoUrl ? `<img src="${it.fotoUrl}" style="width:56px; height:56px; object-fit:cover; border-radius:8px;" onclick="window.open('${it.fotoUrl}','_blank')" />`
-              : `<button class="toggle-btn" style="width:100%;" onclick="mgmAmbilFotoBukti(${idx})">📷 Ambil Foto Bukti</button>`}
-          </div>` : ''}
+        <input class="mgm-card-catatan" type="text" value="${escapeHtml(it.catatan)}" placeholder="${mgmTabAktif === 'hilangrusak' ? 'Kenapa hilang/rusak?' : 'Catatan (opsional)'}" onchange="mgmUbahCatatan(${idx},this.value)" />
+        ${mgmTabAktif === 'hilangrusak' ? (
+          it.fotoUrl
+            ? `<img src="${it.fotoUrl}" style="width:52px; height:52px; object-fit:cover; border-radius:8px; margin-top:8px;" onclick="window.open('${it.fotoUrl}','_blank')" />`
+            : `<button class="toggle-btn mgm-card-foto-btn" onclick="mgmAmbilFotoBukti(${idx})">📷 Ambil Foto Bukti</button>`
+        ) : ''}
       </div>`;
   }).join('');
 }
@@ -16221,14 +16404,14 @@ async function mgmBukaRiwayat() {
   el('screen-memo-gudang-riwayat').style.display = 'flex';
   el('mgm-riwayat-judul').textContent = 'Riwayat ' + MGM_LABEL[mgmTabAktif];
   el('mgm-riwayat-list').innerHTML = '<div style="text-align:center; color:var(--text-dim); padding:20px 0; font-size:12.5px;">Memuat...</div>';
-  const aksiMap = { mintastock: 'lihat_daftar_memo_minta_stock', barangmasuk: 'lihat_daftar_memo_barang_masuk', hilangrusak: 'lihat_daftar_memo_hilang_rusak' };
+  const aksiMap = { mintastock: 'lihat_daftar_memo_minta_stock', barangmasuk: 'lihat_daftar_memo_barang_masuk', hilangrusak: 'lihat_daftar_memo_hilang_rusak', stockopname: 'lihat_daftar_memo_stock_opname' };
   try {
     const data = await postJson({ aksi: aksiMap[mgmTabAktif], email: currentUserEmail() });
     if (!data.success) { el('mgm-riwayat-list').innerHTML = `<div style="color:var(--danger); font-size:12.5px;">Gagal: ${escapeHtml(data.error||'')}</div>`; return; }
     const daftar = data.daftar || [];
     el('mgm-riwayat-empty').style.display = daftar.length === 0 ? 'block' : 'none';
     el('mgm-riwayat-list').innerHTML = daftar.map(m => {
-      const selesai = m.status === 'Bisa PO Stock' || m.status === 'Dieksekusi' || m.status === 'Disetujui';
+      const selesai = m.status === 'Bisa PO Stock' || m.status === 'Dieksekusi' || m.status === 'Disetujui' || m.status === 'Terverifikasi';
       return `
       <div class="section-box" style="width:100%; box-sizing:border-box; ${selesai ? 'opacity:0.55;' : ''}">
         <div style="display:flex; justify-content:space-between; align-items:center;">
@@ -16246,6 +16429,27 @@ async function mgmSubmit() {
   if (mgmTabAktif === 'mintastock') return mgmSubmitMintaStock();
   if (mgmTabAktif === 'barangmasuk') return mgmSubmitBarangMasuk();
   if (mgmTabAktif === 'hilangrusak') return mgmSubmitHilangRusak();
+  if (mgmTabAktif === 'stockopname') return mgmSubmitStockOpname();
+}
+
+async function mgmSubmitStockOpname() {
+  const items = mgmCarts.stockopname;
+  const statusEl = el('mgm-status');
+  if (items.length === 0) { statusEl.textContent = '✗ Keranjang kosong.'; statusEl.className = 'status-text err'; return; }
+  statusEl.textContent = 'Mengirim...'; statusEl.className = 'status-text';
+  const itemsKirim = items.map(it => ({
+    sku: it.sku, nama: it.nama, catatan: it.catatan,
+    stokSistem: it.stokSistem !== undefined ? it.stokSistem : (mgmStokRealtimeCache[it.sku] ? mgmStokRealtimeCache[it.sku].stockSaatIni : 0),
+    stokFisik: it.qty
+  }));
+  try {
+    const data = await postJson({ aksi: 'simpan_memo_stock_opname', items: itemsKirim, email: currentUserEmail() });
+    if (data.success) {
+      playBeep();
+      statusEl.textContent = `✓ Memo ${data.noMemo} terkirim, menunggu verifikasi Back Office.`; statusEl.className = 'status-text ok';
+      mgmCarts.stockopname = []; mgmSimpanDraftLokal(); mgmRenderCart();
+    } else { statusEl.textContent = '✗ Gagal: ' + (data.error || ''); statusEl.className = 'status-text err'; }
+  } catch (err) { statusEl.textContent = '✗ Gagal terhubung: ' + err.message; statusEl.className = 'status-text err'; }
 }
 
 async function mgmSubmitMintaStock() {
