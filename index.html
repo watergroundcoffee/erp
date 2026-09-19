@@ -2180,6 +2180,7 @@ const LOGO_OMI_B64 = "/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAMCAgMCAgMDAwMEAwMEBQgFBQ
             </div>
             <div class="web-user-menu-divider"></div>
             <button class="web-nav-item" data-tab="pengaturan" id="btn-nav-pengaturan" style="display:none;" onclick="gantiTabWeb('pengaturan'); pgtBukaSubMenu('tampilan')">Pengaturan</button>
+            <button class="web-nav-item" data-tab="tagihan" id="btn-nav-tagihan" style="display:none;" onclick="gantiTabWeb('tagihan'); billingMuatPengaturan();">Tagihan</button>
             <button class="web-nav-item" data-tab="pesandev" id="btn-nav-pesandev" style="display:none;" onclick="gantiTabWeb('pesandev')">Pesan Dari Pengguna</button>
             <div class="web-user-menu-divider"></div>
             <button class="web-nav-item" onclick="bukaMobileDariWeb()">Buka Versi Mobile</button>
@@ -3895,7 +3896,6 @@ const LOGO_OMI_B64 = "/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAMCAgMCAgMDAwMEAwMEBQgFBQ
           <button class="web-chart-toggle-btn" data-pgtsub="profile" onclick="pgtBukaSubMenu('profile')" style="padding:7px 14px;">🏢 Company Profile</button>
           <button class="web-chart-toggle-btn" data-pgtsub="carousel" onclick="pgtBukaSubMenu('carousel')" style="padding:7px 14px;">🖼️ Banner Login</button>
           <button class="web-chart-toggle-btn" data-pgtsub="marketplace" onclick="pgtBukaSubMenu('marketplace')" style="padding:7px 14px;">🔗 Otorisasi Marketplace</button>
-          <button class="web-chart-toggle-btn" data-pgtsub="billing" onclick="pgtBukaSubMenu('billing')" style="padding:7px 14px;">💳 Simulasi Tagihan</button>
         </div>
         <div class="web-panel" data-pgtgroup="tampilan" style="max-width:520px; margin-bottom:14px;">
           <div class="web-panel-header"><span>Tampilan</span></div>
@@ -4119,9 +4119,11 @@ const LOGO_OMI_B64 = "/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAMCAgMCAgMDAwMEAwMEBQgFBQ
           <button class="web-btn-primary" style="width:100%;" onclick="pgtSimpanApiKey()">💾 Simpan</button>
           <div class="status-text" id="pgt-status" style="text-align:left; margin-top:8px;"></div>
         </div>
+      </div>
 
-        <!-- ===== SIMULASI PERHITUNGAN TAGIHAN ===== -->
-        <div class="web-panel" data-pgtgroup="billing" style="max-width:820px; display:none;">
+      <!-- ================= TAGIHAN (Owner + role dengan izin lihatTagihan) ================= -->
+      <div class="web-tab-content" id="web-tab-tagihan" style="display:none;">
+        <div class="web-panel" style="max-width:820px;">
           <div class="web-panel-header"><span>💳 Simulasi Perhitungan Tagihan</span></div>
           <div style="font-size:12px; color:var(--web-text-dim); margin-bottom:14px;">Belum ada payment gateway/webhook sungguhan - ini murni simulasi perhitungan & rekap tagihan berdasarkan pemakaian transaksi.</div>
 
@@ -5305,6 +5307,7 @@ function switchKeTampilanWeb() {
   el('web-user-card-nama').textContent = currentUser.nama;
   el('web-user-card-role').textContent = currentUser.role || '-';
   el('btn-nav-pengaturan').style.display = currentUser.isOwner ? 'flex' : 'none';
+  el('btn-nav-tagihan').style.display = (currentUser.isOwner || (currentUser.izin && currentUser.izin.lihatTagihan)) ? 'flex' : 'none';
   el('btn-nav-pesandev').style.display = (currentUser.email === 'developer@testing.local' && currentUser.isOwner) ? 'flex' : 'none';
   perbaruiIkonTema();
   pgtMuatPosisiMenu();
@@ -5388,7 +5391,7 @@ function gantiTabWeb(tab) {
   document.querySelectorAll('.web-tab-content').forEach(div => { div.style.display = 'none'; });
   el('web-tab-' + tab).style.display = 'block';
 
-  const judul = { overview: 'Beranda', pesanan: 'Penjualan', pengiriman: 'Pengiriman', pembelian: 'Pembelian', stock: 'Stock', invoicesupplier: 'Invoice Supplier', staff: 'Kelola Akses' };
+  const judul = { overview: 'Beranda', pesanan: 'Penjualan', pengiriman: 'Pengiriman', pembelian: 'Pembelian', stock: 'Stock', invoicesupplier: 'Invoice Supplier', staff: 'Kelola Akses', tagihan: 'Tagihan' };
   el('web-page-title').textContent = judul[tab] || tab;
 
   if (tab === 'overview') {
@@ -8293,7 +8296,8 @@ const KST_LABEL_IZIN = {
   scanResiKeluar: 'Scan Resi Keluar', scanResiMasuk: 'Scan Resi Masuk', mintaStock: 'Minta Stock',
   adminPembelian: 'Admin Pembelian (Konfirmasi PO)',
   buatInvoice: 'Buat Invoice / Lihat Harga', printLabel: 'Print Label',
-  kirimResi: 'Input No Resi / Kirim', batalPesanan: 'Batalkan Pesanan'
+  kirimResi: 'Input No Resi / Kirim', batalPesanan: 'Batalkan Pesanan',
+  lihatTagihan: 'Lihat Tagihan (Billing)'
 };
 
 function kstBukaSubMenu(sub) {
@@ -9239,10 +9243,10 @@ async function billingHitungSimulasi() {
         <td style="font-size:11.5px;">${escapeHtml(p.tanggalAkhir)}</td>
         <td style="font-weight:600;">${p.jumlahTransaksi.toLocaleString('id-ID')}</td>
         <td>${p.kuota.toLocaleString('id-ID')}</td>
-        <td style="${p.kelebihan > 0 ? 'color:#e07a2f; font-weight:700;' : ''}">${p.kelebihan.toLocaleString('id-ID')}</td>
+        <td style="${p.kelebihan > 0 ? 'color:var(--web-accent); font-weight:700;' : ''}">${p.kelebihan > 0 ? '+' : ''}${p.kelebihan.toLocaleString('id-ID')}</td>
         <td>Rp ${p.hargaDasar.toLocaleString('id-ID')}</td>
-        <td style="${p.biayaOverage > 0 ? 'color:#e07a2f; font-weight:700;' : ''}">Rp ${p.biayaOverage.toLocaleString('id-ID')}</td>
-        <td style="font-weight:800;">Rp ${p.total.toLocaleString('id-ID')}</td>
+        <td style="${p.biayaOverage > 0 ? 'color:var(--web-accent); font-weight:700;' : ''}">${p.biayaOverage > 0 ? '📈 ' : ''}Rp ${p.biayaOverage.toLocaleString('id-ID')}</td>
+        <td style="font-weight:800; ${p.biayaOverage > 0 ? 'color:var(--web-accent);' : ''}">Rp ${p.total.toLocaleString('id-ID')}</td>
       </tr>
     `).join('');
   } catch (err) {
@@ -9262,7 +9266,6 @@ async function pgtMuatStatus() {
   pgtMuatStatusShopee();
   pgtMuatSettingMargin();
   mpMuatStatusKoneksi();
-  billingMuatPengaturan();
   try {
     const data = await postJson({ aksi: 'lihat_pengaturan_api_key', email: currentUserEmail() });
     if (!data.success) { el('pgt-status').textContent = '✗ ' + (data.error || ''); el('pgt-status').className = 'status-text err'; return; }
