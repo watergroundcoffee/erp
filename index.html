@@ -4776,7 +4776,7 @@ const LOGO_OMI_B64 = "/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAMCAgMCAgMDAwMEAwMEBQgFBQ
    ISI URL WEB APP APPS SCRIPT KAMU DI SINI
    ====================================================== */
 const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwscY0Z2ECnEAoHTYWa3BchrfGkLSAxa4ZJAexHnLJJWmGtwbM_hUB0e7TvQT5ERa-j/exec";
-const GOOGLE_CLIENT_ID = "50839351926-94bjqb78trho7eqetj8igvapqken15qi.apps.googleusercontent.com"; // dari Google Cloud Console, diakhiri .apps.googleusercontent.com
+const GOOGLE_CLIENT_ID = "50839351926-94bjqb78trho7eqetj8igvapqken15qi.apps.googleusercontent.com";
 
 
 // Google Login aktif normal. Set true lagi kalau suatu saat perlu dimatikan sementara
@@ -12182,6 +12182,7 @@ function mgRenderCart(tab) {
 
 /* ===== Checklist Invoice (buat Catat Barang Masuk) - reuse endpoint checklist mobile ===== */
 let mgChecklistDaftarInvoice = [];
+let mgChecklistInvoiceSudahDicek = new Set();
 
 async function mgBukaChecklist() {
   el('mg-modal-checklist').style.display = 'flex';
@@ -12189,9 +12190,20 @@ async function mgBukaChecklist() {
   el('mg-checklist-list').innerHTML = '<div style="text-align:center; color:var(--web-text-dim); padding:20px 0; font-size:12.5px;">Memuat daftar invoice...</div>';
   el('mg-checklist-empty').style.display = 'none';
   try {
-    const data = await postJson({ aksi: 'lihat_daftar_invoice_manual_checklist', email: currentUserEmail() });
-    if (!data.success) { el('mg-checklist-list').innerHTML = `<div style="color:var(--web-danger); font-size:12.5px;">Gagal: ${escapeHtml(data.error||'')}</div>`; return; }
-    mgChecklistDaftarInvoice = (data.daftar || []).filter(inv => inv.statusDicek === 'Belum Dicek');
+    const [dataInvoice, dataRiwayat] = await Promise.all([
+      postJson({ aksi: 'lihat_daftar_invoice_manual_checklist', email: currentUserEmail() }),
+      postJson({ aksi: 'lihat_daftar_memo_barang_masuk', email: currentUserEmail() })
+    ]);
+    if (!dataInvoice.success) { el('mg-checklist-list').innerHTML = `<div style="color:var(--web-danger); font-size:12.5px;">Gagal: ${escapeHtml(dataInvoice.error||'')}</div>`; return; }
+    mgChecklistDaftarInvoice = (dataInvoice.daftar || []).filter(inv => inv.statusDicek === 'Belum Dicek');
+
+    // Cocokkan ke riwayat Catat Barang Masuk - No Invoice Terkait yang udah pernah kepakai
+    // di memo manapun (nggak peduli status Menunggu/Dieksekusi) ditandai "udah dicek".
+    mgChecklistInvoiceSudahDicek = new Set(
+      (dataRiwayat.success ? dataRiwayat.daftar : [])
+        .map(m => m.noInvoiceTerkait)
+        .filter(no => no && no !== '-')
+    );
     mgRenderDaftarChecklist();
   } catch (err) {
     el('mg-checklist-list').innerHTML = `<div style="color:var(--web-danger); font-size:12.5px;">Gagal terhubung: ${escapeHtml(err.message)}</div>`;
@@ -12204,12 +12216,18 @@ function mgRenderDaftarChecklist() {
   if (cari) daftar = daftar.filter(inv => inv.noInvoice.toLowerCase().includes(cari) || inv.namaSupplier.toLowerCase().includes(cari));
 
   el('mg-checklist-empty').style.display = daftar.length === 0 ? 'block' : 'none';
-  el('mg-checklist-list').innerHTML = daftar.map(inv => `
-    <div class="mg-saran-item" style="border:1px solid var(--web-border); border-radius:10px; padding:12px;" onclick="mgPilihInvoiceChecklist('${inv.noInvoice.replace(/'/g, "\\'")}')">
-      <b>${escapeHtml(inv.noInvoice)}</b>
+  el('mg-checklist-list').innerHTML = daftar.map(inv => {
+    const sudahDicek = mgChecklistInvoiceSudahDicek.has(inv.noInvoice);
+    return `
+    <div class="mg-saran-item" style="border:1px solid var(--web-border); border-radius:10px; padding:12px; ${sudahDicek ? 'opacity:0.5;' : ''}" onclick="mgPilihInvoiceChecklist('${inv.noInvoice.replace(/'/g, "\\'")}')">
+      <div style="display:flex; align-items:center; gap:8px;">
+        <b>${escapeHtml(inv.noInvoice)}</b>
+        ${sudahDicek ? '<span class="web-status-pill dikirim" style="font-size:9.5px;">✓ Sudah Dicek</span>' : ''}
+      </div>
       <div style="font-size:11.5px; color:var(--web-text-dim); margin-top:2px;">${escapeHtml(inv.namaSupplier)} · ${escapeHtml(inv.tanggal)} · Rp ${Number(inv.total).toLocaleString('id-ID')}</div>
     </div>
-  `).join('');
+  `;
+  }).join('');
 }
 
 async function mgPilihInvoiceChecklist(noInvoice) {
