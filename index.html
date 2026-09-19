@@ -1081,6 +1081,11 @@ const LOGO_OMI_B64 = "/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAMCAgMCAgMDAwMEAwMEBQgFBQ
   .mg-catatan-input { width: 100%; border: 1px solid var(--web-border); border-radius: 6px; padding: 6px 8px; font-size: 12px; }
   .mg-hapus-btn { background: none; border: none; color: var(--web-danger); cursor: pointer; font-size: 15px; }
 
+  /* ===== Ghost style - item dari Checklist yang belum dicocokkan qty fisiknya ===== */
+  .mg-cart-table tr.mg-ghost { opacity: 0.45; }
+  .mg-cart-table tr.mg-ghost td b { font-style: italic; }
+  .mg-qty-target { font-size: 10.5px; color: var(--web-text-dim); font-weight: 600; margin-left: 4px; }
+
   /* ===== Responsif mobile - touch target diperbesar, cart jadi kartu (bukan tabel lebar) ===== */
   @media (max-width: 700px) {
     .mg-input-row { flex-wrap: wrap; }
@@ -4553,13 +4558,20 @@ const LOGO_OMI_B64 = "/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAMCAgMCAgMDAwMEAwMEBQgFBQ
               </div>
               <div id="mg-csm-saran" class="mg-saran-produk" style="display:none;"></div>
 
+              <div id="mg-csm-progres" style="display:none; background:rgba(59,130,246,0.08); border:1px solid var(--web-info); border-radius:8px; padding:8px 14px; font-size:12.5px; font-weight:600; margin-top:10px;"></div>
+
               <div class="web-table-wrap" style="margin-top:12px; max-height:420px;">
                 <table class="web-table mg-cart-table">
                   <thead><tr><th>SKU</th><th style="width:130px;">Qty Masuk</th><th>Catatan / No. Surat Jalan</th><th></th></tr></thead>
                   <tbody id="mg-csm-cart-body"></tbody>
                 </table>
               </div>
-              <div class="web-placeholder" id="mg-csm-cart-empty">Keranjang masih kosong - scan/ketik SKU di atas buat mulai.</div>
+              <div class="web-placeholder" id="mg-csm-cart-empty">
+                Keranjang masih kosong - scan/ketik SKU di atas buat mulai.
+                <div style="margin-top:12px;">
+                  <button class="web-btn-secondary" style="padding:10px 18px; margin:0;" onclick="mgBukaChecklist()">📋 Gunakan Checklist</button>
+                </div>
+              </div>
 
               <button class="web-btn-primary" style="width:100%; margin-top:14px;" onclick="mgKonfirmasiBarangMasuk()">Kirim Memo Barang Masuk</button>
               <div class="status-text" id="mg-csm-status" style="text-align:left; margin-top:6px;"></div>
@@ -4612,6 +4624,19 @@ const LOGO_OMI_B64 = "/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAMCAgMCAgMDAwMEAwMEBQgFBQ
               </div>
               <div id="mg-lhr-riwayat-paginasi"></div>
             </div>
+          </div>
+        </div>
+
+        <!-- Modal Pilih Invoice buat Checklist (Catat Barang Masuk) -->
+        <div id="mg-modal-checklist" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:260; align-items:center; justify-content:center;">
+          <div class="web-panel" style="max-width:460px; width:92%; max-height:80vh; overflow-y:auto;">
+            <div class="web-panel-header" style="display:flex; align-items:center; gap:10px;">
+              <button class="web-btn-secondary" style="padding:4px 10px; margin:0;" onclick="mgTutupChecklist()">◄ Kembali</button>
+              <span>Pilih Invoice buat Checklist</span>
+            </div>
+            <input id="mg-checklist-cari" class="web-search-input" placeholder="🔍 Cari No Invoice / Supplier..." oninput="mgRenderDaftarChecklist()" style="margin-top:10px; width:100%;" />
+            <div id="mg-checklist-list" style="margin-top:10px; display:flex; flex-direction:column; gap:8px;"></div>
+            <div class="web-placeholder" id="mg-checklist-empty" style="display:none;">Nggak ada invoice yang masih "Belum Dicek".</div>
           </div>
         </div>
 
@@ -12100,19 +12125,34 @@ function mgRenderCart(tab) {
         </tr>`;
     }).join('');
   } else if (tab === 'barangmasuk') {
-    el('mg-csm-cart-body').innerHTML = cart.map((it, idx) => `
-      <tr>
+    const itemChecklist = cart.filter(it => it.dariChecklist);
+    const progresEl = el('mg-csm-progres');
+    if (itemChecklist.length > 0) {
+      const terpenuhi = itemChecklist.filter(it => (parseFloat(it.qty) || 0) >= it.qtyTarget).length;
+      progresEl.textContent = `Progres Cek Fisik: ${terpenuhi} / ${itemChecklist.length} SKU`;
+      progresEl.style.display = 'block';
+    } else {
+      progresEl.style.display = 'none';
+    }
+
+    el('mg-csm-cart-body').innerHTML = cart.map((it, idx) => {
+      const sudahTerpenuhi = it.dariChecklist ? (parseFloat(it.qty) || 0) >= it.qtyTarget : true;
+      const rowClass = it.dariChecklist && !sudahTerpenuhi ? 'mg-ghost' : '';
+      return `
+      <tr class="${rowClass}">
         <td data-label="SKU"><b>${escapeHtml(it.sku)}</b><div style="font-size:10.5px; color:var(--web-text-dim);">${escapeHtml(it.nama)}</div></td>
         <td data-label="Qty Masuk">
           <div class="mg-qty-stepper">
             <button class="mg-qty-btn" onclick="mgUbahQty('barangmasuk',${idx},-1)">-</button>
             <input class="mg-qty-input" type="number" value="${it.qty}" onchange="mgSetQtyLangsung('barangmasuk',${idx},this.value)" />
             <button class="mg-qty-btn" onclick="mgUbahQty('barangmasuk',${idx},1)">+</button>
+            ${it.dariChecklist ? `<span class="mg-qty-target">/ ${it.qtyTarget}</span>` : ''}
           </div>
         </td>
         <td data-label="Catatan"><input class="mg-catatan-input" value="${escapeHtml(it.catatan)}" placeholder="Opsional" onchange="mgUbahCatatan('barangmasuk',${idx},this.value)" /></td>
         <td data-label=""><button class="mg-hapus-btn" onclick="mgHapusItem('barangmasuk',${idx})">✕ Hapus</button></td>
-      </tr>`).join('');
+      </tr>`;
+    }).join('');
   } else if (tab === 'hilangrusak') {
     el('mg-lhr-cart-body').innerHTML = cart.map((it, idx) => `
       <tr>
@@ -12132,6 +12172,56 @@ function mgRenderCart(tab) {
         <td data-label=""><button class="mg-hapus-btn" onclick="mgHapusItem('hilangrusak',${idx})">✕ Hapus</button></td>
       </tr>`).join('');
   }
+}
+
+/* ===== Checklist Invoice (buat Catat Barang Masuk) - reuse endpoint checklist mobile ===== */
+let mgChecklistDaftarInvoice = [];
+
+async function mgBukaChecklist() {
+  el('mg-modal-checklist').style.display = 'flex';
+  el('mg-checklist-cari').value = '';
+  el('mg-checklist-list').innerHTML = '<div style="text-align:center; color:var(--web-text-dim); padding:20px 0; font-size:12.5px;">Memuat daftar invoice...</div>';
+  el('mg-checklist-empty').style.display = 'none';
+  try {
+    const data = await postJson({ aksi: 'lihat_daftar_invoice_manual_checklist', email: currentUserEmail() });
+    if (!data.success) { el('mg-checklist-list').innerHTML = `<div style="color:var(--web-danger); font-size:12.5px;">Gagal: ${escapeHtml(data.error||'')}</div>`; return; }
+    mgChecklistDaftarInvoice = (data.daftar || []).filter(inv => inv.statusDicek === 'Belum Dicek');
+    mgRenderDaftarChecklist();
+  } catch (err) {
+    el('mg-checklist-list').innerHTML = `<div style="color:var(--web-danger); font-size:12.5px;">Gagal terhubung: ${escapeHtml(err.message)}</div>`;
+  }
+}
+
+function mgRenderDaftarChecklist() {
+  const cari = (el('mg-checklist-cari')?.value || '').toLowerCase().trim();
+  let daftar = mgChecklistDaftarInvoice;
+  if (cari) daftar = daftar.filter(inv => inv.noInvoice.toLowerCase().includes(cari) || inv.namaSupplier.toLowerCase().includes(cari));
+
+  el('mg-checklist-empty').style.display = daftar.length === 0 ? 'block' : 'none';
+  el('mg-checklist-list').innerHTML = daftar.map(inv => `
+    <div class="mg-saran-item" style="border:1px solid var(--web-border); border-radius:10px; padding:12px;" onclick="mgPilihInvoiceChecklist('${inv.noInvoice.replace(/'/g, "\\'")}')">
+      <b>${escapeHtml(inv.noInvoice)}</b>
+      <div style="font-size:11.5px; color:var(--web-text-dim); margin-top:2px;">${escapeHtml(inv.namaSupplier)} · ${escapeHtml(inv.tanggal)} · Rp ${Number(inv.total).toLocaleString('id-ID')}</div>
+    </div>
+  `).join('');
+}
+
+async function mgPilihInvoiceChecklist(noInvoice) {
+  el('mg-checklist-list').innerHTML = '<div style="text-align:center; color:var(--web-text-dim); padding:20px 0; font-size:12.5px;">Memuat item invoice...</div>';
+  try {
+    const data = await postJson({ aksi: 'lihat_detail_invoice_manual_checklist', noInvoice, email: currentUserEmail() });
+    if (!data.success) { alert('Gagal ambil detail invoice: ' + (data.error || '')); mgRenderDaftarChecklist(); return; }
+    mgCarts.barangmasuk = (data.daftar || []).map(it => ({
+      sku: it.sku, nama: it.nama, qty: 0, catatan: '', qtyTarget: it.qtyInvoice, dariChecklist: true, noInvoiceAsal: noInvoice
+    }));
+    mgSimpanDraftLokal();
+    mgTutupChecklist();
+    mgRenderCart('barangmasuk');
+  } catch (err) { alert('Gagal terhubung: ' + err.message); mgRenderDaftarChecklist(); }
+}
+
+function mgTutupChecklist() {
+  el('mg-modal-checklist').style.display = 'none';
 }
 
 /* ===== Kamera (dipakai bareng: scan SKU di 3 tab, ATAU foto bukti Hilang/Rusak) ===== */
