@@ -5259,8 +5259,46 @@ function renderPaginasi(containerId, totalItems, state, onGantiHalaman) {
 
 function toggleNavGroup(btnEl) {
   const group = btnEl.closest('.web-nav-group');
-  if (group) group.classList.toggle('web-nav-group-open');
+  if (!group) return;
+  const sedangTerbuka = group.classList.contains('web-nav-group-open');
+  // Accordion - tutup SEMUA grup lain dulu, biar cuma 1 yang bisa kebuka dalam satu waktu
+  document.querySelectorAll('.web-nav-group.web-nav-group-open').forEach(g => g.classList.remove('web-nav-group-open'));
+  // Kalau yang diklik ini sebelumnya BELUM terbuka, baru buka sekarang (kalau sebelumnya udah
+  // terbuka, biarkan tertutup - jadi klik ulang tetap bisa "tutup manual" grup yang aktif)
+  if (!sedangTerbuka) group.classList.add('web-nav-group-open');
 }
+
+// PENTING: di mode "Header Atas" (web-menu-top), submenu tampil kalau HOVER *ATAU* class
+// .web-nav-group-open (dari klik) - dua kondisi ini independen di CSS. Tanpa listener ini,
+// grup yang "nempel" kebuka via klik TETAP kelihatan walau kamu udah hover ke grup lain -
+// nyebabin beberapa dropdown numpuk bersamaan. Listener ini nutup paksa grup lain (hapus
+// class-nya) begitu kursor masuk ke grup manapun, jadi cuma 1 dropdown yang bisa kelihatan.
+document.querySelectorAll('.web-nav-group').forEach(group => {
+  group.addEventListener('mouseenter', () => {
+    document.querySelectorAll('.web-nav-group.web-nav-group-open').forEach(g => {
+      if (g !== group) g.classList.remove('web-nav-group-open');
+    });
+  });
+});
+
+// Lapisan kedua yang TEGAS - event delegation di level sidebar itu sendiri. Ini jalan
+// SETELAH toggleNavGroup() (inline onclick di tombol duluan, baru bubbling ke sini),
+// dan MEMASTIKAN cuma 1 grup yang open - nggak peduli apapun state sebelumnya atau
+// jalur mana yang bikin grup lain kebuka. Ini "penegak terakhir" biar accordion beneran
+// eksklusif, bukan cuma bergantung ke satu tempat doang.
+(function () {
+  var sidebarEl = document.querySelector('.web-sidebar');
+  if (!sidebarEl) return;
+  sidebarEl.addEventListener('click', function (e) {
+    var btn = e.target.closest('.web-nav-item[data-tab]');
+    if (!btn) return;
+    var group = btn.closest('.web-nav-group');
+    if (!group) return;
+    document.querySelectorAll('.web-nav-group.web-nav-group-open').forEach(function (g) {
+      if (g !== group) g.classList.remove('web-nav-group-open');
+    });
+  });
+})();
 
 function toggleInsightPanel() {
   const shell = document.querySelector('.web-shell');
@@ -5367,7 +5405,10 @@ function pulihkanLokasiTerakhir() {
   // setelah refresh walau kontennya udah bener di halaman yang sama.
   if (tombolTab) {
     var grup = tombolTab.closest('.web-nav-group');
-    if (grup) grup.classList.add('web-nav-group-open');
+    if (grup) {
+      document.querySelectorAll('.web-nav-group.web-nav-group-open').forEach(function (g) { g.classList.remove('web-nav-group-open'); });
+      grup.classList.add('web-nav-group-open');
+    }
   }
   if (lokasi.sub && submenuMap[lokasi.tab]) {
     submenuMap[lokasi.tab](lokasi.sub);
